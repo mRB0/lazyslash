@@ -1,5 +1,7 @@
 #pragma once
 
+#include "CompoEntry.h"
+
 using namespace System;
 using namespace System::ComponentModel;
 using namespace System::Collections;
@@ -9,7 +11,7 @@ using namespace System::Drawing;
 
 
 namespace lazyslash {
-
+	
 	/// <summary>
 	/// Summary for EntryEditor
 	///
@@ -22,7 +24,7 @@ namespace lazyslash {
 	public ref class EntryEditor : public System::Windows::Forms::Form
 	{
 	public:
-		EntryEditor(void)
+		EntryEditor(CompoEntry^ ce)
 		{
 			InitializeComponent();
 			//
@@ -32,9 +34,17 @@ namespace lazyslash {
 			this->CancelButton = this->canButton;
 			this->AcceptButton = this->okButton;
 			
+			this->ce = ce;
+			
+			this->fullpathBox->Text = this->ce->filespec;
+			this->titleField->Text = this->ce->songtitle;
+			this->filenameField->Text = this->ce->filename;
+			this->nickField->Text = this->ce->composer;
 		}
 
 	protected:
+		CompoEntry ^ce;
+
 		/// <summary>
 		/// Clean up any resources being used.
 		/// </summary>
@@ -57,6 +67,8 @@ namespace lazyslash {
 
 	private: System::Windows::Forms::Button^  okButton;
 	private: System::Windows::Forms::Button^  canButton;
+	private: System::Windows::Forms::TextBox^  fullpathBox;
+
 
 	private:
 		/// <summary>
@@ -79,6 +91,7 @@ namespace lazyslash {
 			this->titleField = (gcnew System::Windows::Forms::TextBox());
 			this->okButton = (gcnew System::Windows::Forms::Button());
 			this->canButton = (gcnew System::Windows::Forms::Button());
+			this->fullpathBox = (gcnew System::Windows::Forms::TextBox());
 			this->SuspendLayout();
 			// 
 			// label1
@@ -143,6 +156,7 @@ namespace lazyslash {
 			this->okButton->TabIndex = 6;
 			this->okButton->Text = L"OK";
 			this->okButton->UseVisualStyleBackColor = true;
+			this->okButton->Click += gcnew System::EventHandler(this, &EntryEditor::okButton_Click);
 			// 
 			// canButton
 			// 
@@ -154,11 +168,22 @@ namespace lazyslash {
 			this->canButton->Text = L"Cancel";
 			this->canButton->UseVisualStyleBackColor = true;
 			// 
+			// fullpathBox
+			// 
+			this->fullpathBox->Anchor = static_cast<System::Windows::Forms::AnchorStyles>(((System::Windows::Forms::AnchorStyles::Top | System::Windows::Forms::AnchorStyles::Left) 
+				| System::Windows::Forms::AnchorStyles::Right));
+			this->fullpathBox->Location = System::Drawing::Point(15, 53);
+			this->fullpathBox->Name = L"fullpathBox";
+			this->fullpathBox->ReadOnly = true;
+			this->fullpathBox->Size = System::Drawing::Size(192, 20);
+			this->fullpathBox->TabIndex = 8;
+			// 
 			// EntryEditor
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
 			this->ClientSize = System::Drawing::Size(381, 86);
+			this->Controls->Add(this->fullpathBox);
 			this->Controls->Add(this->canButton);
 			this->Controls->Add(this->okButton);
 			this->Controls->Add(this->titleField);
@@ -176,5 +201,15 @@ namespace lazyslash {
 #pragma endregion
 		
 
+		private: System::Void okButton_Click(System::Object^  sender, System::EventArgs^  e)
+		{
+			this->ce->filespec = this->fullpathBox->Text;
+			this->ce->songtitle = this->titleField->Text;
+			this->ce->filename = this->filenameField->Text;
+			this->ce->composer = this->nickField->Text;
+
+			this->DialogResult = System::Windows::Forms::DialogResult::OK;
+			this->Close();
+		}
 	};
 }
