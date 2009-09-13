@@ -53,8 +53,10 @@ namespace lazyslash {
 			{
 				array<unsigned char>^ namedata = breader->ReadBytes(26);
 
-				int titlelen = namedata->IndexOf(namedata, '\0');
+				int titlelen = System::Array::IndexOf((array<unsigned char>^)namedata, (unsigned char)0);
 				
+				Console::WriteLine("titlelen is " + titlelen.ToString());
+
 				if (titlelen == -1)
 				{
 					titlelen = 26;
@@ -109,7 +111,7 @@ namespace lazyslash {
 
 				array<unsigned char>^ namedata = breader->ReadBytes(108);
 
-				int titlelen = namedata->IndexOf(namedata, '\0');
+				int titlelen = System::Array::IndexOf((array<unsigned char>^)namedata, (unsigned char)0);
 				
 				if (titlelen == -1)
 				{
@@ -150,7 +152,7 @@ namespace lazyslash {
 			{
 				array<unsigned char>^ namedata = breader->ReadBytes(20);
 
-				int titlelen = namedata->IndexOf(namedata, '\0');
+				int titlelen = System::Array::IndexOf((array<unsigned char>^)namedata, (unsigned char)0);
 				
 				if (titlelen == -1)
 				{
@@ -216,7 +218,7 @@ namespace lazyslash {
 			// s3m stores song name first, so let's read it first...
 			array<unsigned char>^ namedata = breader->ReadBytes(28);
 
-			int titlelen = namedata->IndexOf(namedata, '\0');
+			int titlelen = System::Array::IndexOf((array<unsigned char>^)namedata, (unsigned char)0);
 			
 			if (titlelen == -1)
 			{
@@ -257,7 +259,7 @@ namespace lazyslash {
 			// mod stores the name (20 characters, nulls) and that is all.
 			array<unsigned char>^ namedata = breader->ReadBytes(20);
 
-			int titlelen = namedata->IndexOf(namedata, '\0');
+			int titlelen = System::Array::IndexOf((array<unsigned char>^)namedata, (unsigned char)0);
 			
 			if (titlelen == -1)
 			{
