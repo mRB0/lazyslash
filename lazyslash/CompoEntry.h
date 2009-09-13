@@ -16,16 +16,23 @@ namespace lazyslash {
 	public:
 		CompoEntry(void)
 		{
+			this->filespec = L"";
+			this->filename = L"";
+			this->songtitle = L"";
+			this->composer = L"";
+			this->voted = false;
 		}
 		CompoEntry(String^ filespec, String^ songtitle)
 		{
 			this->filespec = filespec;
+			this->filename = System::IO::Path::GetFileName(filespec);
 			this->songtitle = songtitle;
 			this->composer = L"";
 			this->voted = false;
 		}
 
 		String^ filespec;
+		String^ filename;
 		String^ songtitle;
 		String^ composer;
 		bool voted;

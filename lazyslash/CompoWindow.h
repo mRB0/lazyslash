@@ -41,6 +41,7 @@ namespace lazyslash {
 
 			this->entriesList->ListViewItemSorter = gcnew ListViewItemComparer(sort_col, sort_ascending, this->_empty_item);
 
+			this->check_zip_button();
 
 			//
 			//TODO: Add the constructor code here
@@ -54,6 +55,7 @@ namespace lazyslash {
 	private: System::Windows::Forms::ContextMenuStrip^  entriesMenuStrip;
 	protected: 
 	private: System::Windows::Forms::ToolStripMenuItem^  removeToolStripMenuItem;
+	private: System::Windows::Forms::Label^  zipErrorLabel;
 			 int sort_col;
 
 		/// <summary>
@@ -145,6 +147,7 @@ namespace lazyslash {
 			this->saveToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
 			this->saveAsToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
 			this->exitToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
+			this->zipErrorLabel = (gcnew System::Windows::Forms::Label());
 			this->tabControl1->SuspendLayout();
 			this->entriesTab->SuspendLayout();
 			this->entriesMenuStrip->SuspendLayout();
@@ -167,6 +170,7 @@ namespace lazyslash {
 			// 
 			// entriesTab
 			// 
+			this->entriesTab->Controls->Add(this->zipErrorLabel);
 			this->entriesTab->Controls->Add(this->createzipButton);
 			this->entriesTab->Controls->Add(this->entriesList);
 			this->entriesTab->Controls->Add(this->txtCompoName1);
@@ -429,6 +433,17 @@ namespace lazyslash {
 			this->exitToolStripMenuItem->Size = System::Drawing::Size(125, 22);
 			this->exitToolStripMenuItem->Text = L"E&xit";
 			// 
+			// zipErrorLabel
+			// 
+			this->zipErrorLabel->Anchor = static_cast<System::Windows::Forms::AnchorStyles>(((System::Windows::Forms::AnchorStyles::Bottom | System::Windows::Forms::AnchorStyles::Left) 
+				| System::Windows::Forms::AnchorStyles::Right));
+			this->zipErrorLabel->AutoSize = true;
+			this->zipErrorLabel->Location = System::Drawing::Point(155, 262);
+			this->zipErrorLabel->Name = L"zipErrorLabel";
+			this->zipErrorLabel->Size = System::Drawing::Size(85, 13);
+			this->zipErrorLabel->TabIndex = 5;
+			this->zipErrorLabel->Text = L"duck duck duck";
+			// 
 			// CompoWindow
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
@@ -459,10 +474,45 @@ namespace lazyslash {
 			CompoEntry^ ce = (CompoEntry^)(edititem->Tag);
 			edititem->SubItems[0]->Text = (ce->voted ? L"yes" : L"NO");
 			edititem->SubItems[1]->Text = ce->composer;
-			edititem->SubItems[2]->Text = System::IO::Path::GetFileName(ce->filespec);
+			edititem->SubItems[2]->Text = ce->filename;
 			edititem->SubItems[3]->Text = ce->songtitle;
 			//ce->songtitle
 		}
+
+		private: System::Void check_zip_button(void)
+		{
+			if (this->entriesList->Items->Count <= 1)
+			{
+				this->createzipButton->Enabled = false;
+				this->zipErrorLabel->Text = L"Drag files into the list";
+			}
+			else
+			{
+				bool canzip = true;
+
+				for each (System::Windows::Forms::ListViewItem^ lvi in this->entriesList->Items)
+				{
+					if (lvi != this->_empty_item)
+					{
+						if (((CompoEntry^)(lvi->Tag))->filespec == L"")
+						{
+							canzip = false;
+						}
+					}
+				}
+				if (canzip)
+				{
+					this->zipErrorLabel->Text = L"Boy! Eucalyptus!";
+					this->createzipButton->Enabled = true;
+				}
+				else
+				{
+					this->zipErrorLabel->Text = L"All entries require a full path to zip!";
+					this->createzipButton->Enabled = false;
+				}
+			}
+		}
+
 		private: System::Void CompoWindow_Load(System::Object^  sender, System::EventArgs^  e)
 		{
 		}
@@ -512,6 +562,7 @@ namespace lazyslash {
 
 			this->entriesList->Items->Add(_empty_item);
 			this->entriesList->Sort();
+			this->check_zip_button();
 
 		}
 
@@ -577,6 +628,7 @@ namespace lazyslash {
 					this->entriesList->Items->Remove(killitem);
 				}
 			}
+			this->check_zip_button();
 		}
 
 		private: System::Void createzipButton_Click(System::Object^  sender, System::EventArgs^  e)
@@ -615,22 +667,33 @@ namespace lazyslash {
 			{
 				if (edititem != this->_empty_item)
 				{
+					CompoEntry^ ce = (CompoEntry^)(edititem->Tag);
+
 					// edit item
-					EntryEditor ee;
+					EntryEditor ee(ce);
 					ee.ShowDialog();
 
-					((CompoEntry^)(edititem->Tag))->songtitle = L"LOL";
 					// make list entry match CompoEntry tag
 					this->match_entrylist_to_entry(edititem);
 					this->entriesList->Sort();
 				}
 				else
 				{
-					EntryEditor ee;
-					ee.ShowDialog();
+					CompoEntry ^ce = gcnew CompoEntry();
 
+					EntryEditor ee(ce);
+					if (ee.ShowDialog() == System::Windows::Forms::DialogResult::OK)
+					{
+						ListViewItem^ new_item = gcnew ListViewItem(gcnew array<String^>{L"",L"",L"",L""});
+						new_item->Tag = ce;
+
+						this->entriesList->Items->Add(new_item);
+						this->match_entrylist_to_entry(new_item);
+					}
 				}
 			}
+			this->entriesList->Sort();
+			this->check_zip_button();
 		}
 };
 
