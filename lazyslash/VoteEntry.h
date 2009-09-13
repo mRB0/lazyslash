@@ -32,7 +32,7 @@ namespace lazyslash {
 			this->entrants = entrants;
 			this->songs = songs;
 
-			this->AcceptButton = this->addVoteBtn;
+			this->AcceptButton = this->okButton;
 			this->CancelButton = this->canButton;
 			
 			this->voterCombo->DropDownStyle = System::Windows::Forms::ComboBoxStyle::DropDownList;
@@ -74,6 +74,8 @@ namespace lazyslash {
 		
 		VoteData^ vd;
 		ArrayList^ entrants;
+	private: System::Windows::Forms::Button^  unVoteBtn;
+	protected: 
 		ArrayList^ songs;
 		
 
@@ -121,6 +123,7 @@ namespace lazyslash {
 			this->chosenBox = (gcnew System::Windows::Forms::ListBox());
 			this->okButton = (gcnew System::Windows::Forms::Button());
 			this->canButton = (gcnew System::Windows::Forms::Button());
+			this->unVoteBtn = (gcnew System::Windows::Forms::Button());
 			this->SuspendLayout();
 			// 
 			// label1
@@ -171,14 +174,16 @@ namespace lazyslash {
 			this->availBox->Name = L"availBox";
 			this->availBox->Size = System::Drawing::Size(162, 173);
 			this->availBox->TabIndex = 4;
+			this->availBox->Leave += gcnew System::EventHandler(this, &VoteEntry::availBox_Leave);
+			this->availBox->Enter += gcnew System::EventHandler(this, &VoteEntry::availBox_Enter);
 			this->availBox->DoubleClick += gcnew System::EventHandler(this, &VoteEntry::availBox_DoubleClick);
 			// 
 			// addVoteBtn
 			// 
 			this->addVoteBtn->Anchor = System::Windows::Forms::AnchorStyles::None;
-			this->addVoteBtn->Location = System::Drawing::Point(180, 100);
+			this->addVoteBtn->Location = System::Drawing::Point(180, 74);
 			this->addVoteBtn->Name = L"addVoteBtn";
-			this->addVoteBtn->Size = System::Drawing::Size(41, 39);
+			this->addVoteBtn->Size = System::Drawing::Size(41, 41);
 			this->addVoteBtn->TabIndex = 5;
 			this->addVoteBtn->Text = L"=>";
 			this->addVoteBtn->UseVisualStyleBackColor = true;
@@ -193,6 +198,9 @@ namespace lazyslash {
 			this->chosenBox->Name = L"chosenBox";
 			this->chosenBox->Size = System::Drawing::Size(157, 173);
 			this->chosenBox->TabIndex = 6;
+			this->chosenBox->Leave += gcnew System::EventHandler(this, &VoteEntry::chosenBox_Leave);
+			this->chosenBox->Enter += gcnew System::EventHandler(this, &VoteEntry::chosenBox_Enter);
+			this->chosenBox->DoubleClick += gcnew System::EventHandler(this, &VoteEntry::chosenBox_DoubleClick);
 			// 
 			// okButton
 			// 
@@ -215,11 +223,23 @@ namespace lazyslash {
 			this->canButton->Text = L"Cancel";
 			this->canButton->UseVisualStyleBackColor = true;
 			// 
+			// unVoteBtn
+			// 
+			this->unVoteBtn->Anchor = System::Windows::Forms::AnchorStyles::None;
+			this->unVoteBtn->Location = System::Drawing::Point(180, 121);
+			this->unVoteBtn->Name = L"unVoteBtn";
+			this->unVoteBtn->Size = System::Drawing::Size(41, 41);
+			this->unVoteBtn->TabIndex = 9;
+			this->unVoteBtn->Text = L"<=";
+			this->unVoteBtn->UseVisualStyleBackColor = true;
+			this->unVoteBtn->Click += gcnew System::EventHandler(this, &VoteEntry::unVoteBtn_Click);
+			// 
 			// VoteEntry
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
 			this->ClientSize = System::Drawing::Size(396, 241);
+			this->Controls->Add(this->unVoteBtn);
 			this->Controls->Add(this->canButton);
 			this->Controls->Add(this->okButton);
 			this->Controls->Add(this->chosenBox);
@@ -266,6 +286,22 @@ namespace lazyslash {
 			}
 		}
 		
+		private: System::Void unmove_selection(void)
+		{
+			ArrayList al;
+
+			for each (String^ moving in this->chosenBox->SelectedItems)
+			{
+				this->availBox->Items->Add(moving);
+				al.Add(moving);
+			}
+			for each (String^ removing in al)
+			{
+				this->chosenBox->Items->Remove(removing);
+			}
+
+			check_completed();
+		}
 		private: System::Void move_selection(void)
 		{
 			ArrayList al;
@@ -313,5 +349,29 @@ namespace lazyslash {
 			this->DialogResult = System::Windows::Forms::DialogResult::OK;
 			this->Close();
 		}
-	};
+		private: System::Void chosenBox_DoubleClick(System::Object^  sender, System::EventArgs^  e)
+		{
+			this->unmove_selection();
+		}
+		private: System::Void unVoteBtn_Click(System::Object^  sender, System::EventArgs^  e)
+		{
+			this->unmove_selection();
+		}
+		private: System::Void availBox_Enter(System::Object^  sender, System::EventArgs^  e)
+		{
+			this->AcceptButton = this->addVoteBtn;
+		}
+		private: System::Void availBox_Leave(System::Object^  sender, System::EventArgs^  e)
+		{
+			this->AcceptButton = this->okButton;
+		}
+		private: System::Void chosenBox_Enter(System::Object^  sender, System::EventArgs^  e)
+		{
+			this->AcceptButton = this->unVoteBtn;
+		}
+		private: System::Void chosenBox_Leave(System::Object^  sender, System::EventArgs^  e) 
+		{
+			this->AcceptButton = this->okButton;
+		}
+};
 }
