@@ -292,6 +292,28 @@
 				FileType="1"
 				>
 			</File>
+			<File
+				RelativePath=".\VoteData.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\VoteData.h"
+				FileType="1"
+				>
+			</File>
+			<File
+				RelativePath=".\VoteEntry.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\VoteEntry.h"
+				FileType="3"
+				>
+				<File
+					RelativePath=".\VoteEntry.resx"
+					>
+				</File>
+			</File>
 		</Filter>
 		<Filter
 			Name="Resource Files"

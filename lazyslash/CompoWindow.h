@@ -4,6 +4,8 @@
 #include "ListViewItemComparer.h"
 #include "CompoEntry.h"
 #include "EntryEditor.h"
+#include "VoteEntry.h"
+#include "VoteData.h"
 
 namespace lazyslash {
 
@@ -56,6 +58,9 @@ namespace lazyslash {
 	protected: 
 	private: System::Windows::Forms::ToolStripMenuItem^  removeToolStripMenuItem;
 	private: System::Windows::Forms::Label^  zipErrorLabel;
+	private: System::Windows::Forms::ContextMenuStrip^  votesMenuStrip;
+	private: System::Windows::Forms::ToolStripMenuItem^  pasteToolStripMenuItem;
+	private: System::Windows::Forms::ToolStripMenuItem^  addToolStripMenuItem;
 			 int sort_col;
 
 		/// <summary>
@@ -95,8 +100,8 @@ namespace lazyslash {
 
 	private: System::Windows::Forms::Label^  label3;
 	private: System::Windows::Forms::Label^  label2;
-	private: System::Windows::Forms::Button^  pasteButton;
-	private: System::Windows::Forms::Button^  addVoterButton;
+
+
 	private: System::Windows::Forms::ListView^  voteList;
 	private: System::Windows::Forms::Button^  exportButton;
 	private: System::Windows::Forms::Button^  viewButton;
@@ -121,6 +126,7 @@ namespace lazyslash {
 			this->components = (gcnew System::ComponentModel::Container());
 			this->tabControl1 = (gcnew System::Windows::Forms::TabControl());
 			this->entriesTab = (gcnew System::Windows::Forms::TabPage());
+			this->zipErrorLabel = (gcnew System::Windows::Forms::Label());
 			this->createzipButton = (gcnew System::Windows::Forms::Button());
 			this->entriesList = (gcnew System::Windows::Forms::ListView());
 			this->columnHeader0 = (gcnew System::Windows::Forms::ColumnHeader());
@@ -135,9 +141,10 @@ namespace lazyslash {
 			this->tabPage2 = (gcnew System::Windows::Forms::TabPage());
 			this->exportButton = (gcnew System::Windows::Forms::Button());
 			this->viewButton = (gcnew System::Windows::Forms::Button());
-			this->pasteButton = (gcnew System::Windows::Forms::Button());
-			this->addVoterButton = (gcnew System::Windows::Forms::Button());
 			this->voteList = (gcnew System::Windows::Forms::ListView());
+			this->votesMenuStrip = (gcnew System::Windows::Forms::ContextMenuStrip(this->components));
+			this->addToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
+			this->pasteToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
 			this->txtCompoName2 = (gcnew System::Windows::Forms::TextBox());
 			this->label3 = (gcnew System::Windows::Forms::Label());
 			this->label2 = (gcnew System::Windows::Forms::Label());
@@ -147,11 +154,11 @@ namespace lazyslash {
 			this->saveToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
 			this->saveAsToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
 			this->exitToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
-			this->zipErrorLabel = (gcnew System::Windows::Forms::Label());
 			this->tabControl1->SuspendLayout();
 			this->entriesTab->SuspendLayout();
 			this->entriesMenuStrip->SuspendLayout();
 			this->tabPage2->SuspendLayout();
+			this->votesMenuStrip->SuspendLayout();
 			this->mainMenuStrip->SuspendLayout();
 			this->SuspendLayout();
 			// 
@@ -167,6 +174,7 @@ namespace lazyslash {
 			this->tabControl1->SelectedIndex = 0;
 			this->tabControl1->Size = System::Drawing::Size(438, 314);
 			this->tabControl1->TabIndex = 0;
+			this->tabControl1->Selecting += gcnew System::Windows::Forms::TabControlCancelEventHandler(this, &CompoWindow::tabControl1_Selecting);
 			// 
 			// entriesTab
 			// 
@@ -183,6 +191,17 @@ namespace lazyslash {
 			this->entriesTab->TabIndex = 0;
 			this->entriesTab->Text = L"Entries";
 			this->entriesTab->UseVisualStyleBackColor = true;
+			// 
+			// zipErrorLabel
+			// 
+			this->zipErrorLabel->Anchor = static_cast<System::Windows::Forms::AnchorStyles>(((System::Windows::Forms::AnchorStyles::Bottom | System::Windows::Forms::AnchorStyles::Left) 
+				| System::Windows::Forms::AnchorStyles::Right));
+			this->zipErrorLabel->AutoSize = true;
+			this->zipErrorLabel->Location = System::Drawing::Point(155, 262);
+			this->zipErrorLabel->Name = L"zipErrorLabel";
+			this->zipErrorLabel->Size = System::Drawing::Size(85, 13);
+			this->zipErrorLabel->TabIndex = 5;
+			this->zipErrorLabel->Text = L"duck duck duck";
 			// 
 			// createzipButton
 			// 
@@ -288,8 +307,6 @@ namespace lazyslash {
 			// 
 			this->tabPage2->Controls->Add(this->exportButton);
 			this->tabPage2->Controls->Add(this->viewButton);
-			this->tabPage2->Controls->Add(this->pasteButton);
-			this->tabPage2->Controls->Add(this->addVoterButton);
 			this->tabPage2->Controls->Add(this->voteList);
 			this->tabPage2->Controls->Add(this->txtCompoName2);
 			this->tabPage2->Controls->Add(this->label3);
@@ -322,42 +339,44 @@ namespace lazyslash {
 			this->viewButton->Text = L"View results";
 			this->viewButton->UseVisualStyleBackColor = true;
 			// 
-			// pasteButton
-			// 
-			this->pasteButton->Anchor = System::Windows::Forms::AnchorStyles::Right;
-			this->pasteButton->Location = System::Drawing::Point(349, 144);
-			this->pasteButton->Margin = System::Windows::Forms::Padding(3, 50, 3, 60);
-			this->pasteButton->Name = L"pasteButton";
-			this->pasteButton->Size = System::Drawing::Size(75, 23);
-			this->pasteButton->TabIndex = 7;
-			this->pasteButton->Text = L"Paste";
-			this->pasteButton->UseVisualStyleBackColor = true;
-			this->pasteButton->Click += gcnew System::EventHandler(this, &CompoWindow::pasteButton_Click);
-			// 
-			// addVoterButton
-			// 
-			this->addVoterButton->Anchor = System::Windows::Forms::AnchorStyles::Right;
-			this->addVoterButton->Location = System::Drawing::Point(349, 115);
-			this->addVoterButton->Margin = System::Windows::Forms::Padding(3, 50, 3, 60);
-			this->addVoterButton->Name = L"addVoterButton";
-			this->addVoterButton->Size = System::Drawing::Size(75, 23);
-			this->addVoterButton->TabIndex = 6;
-			this->addVoterButton->Text = L"Add";
-			this->addVoterButton->UseVisualStyleBackColor = true;
-			this->addVoterButton->Click += gcnew System::EventHandler(this, &CompoWindow::addVoterButton_Click);
-			// 
 			// voteList
 			// 
 			this->voteList->Anchor = static_cast<System::Windows::Forms::AnchorStyles>((((System::Windows::Forms::AnchorStyles::Top | System::Windows::Forms::AnchorStyles::Bottom) 
 				| System::Windows::Forms::AnchorStyles::Left) 
 				| System::Windows::Forms::AnchorStyles::Right));
+			this->voteList->ContextMenuStrip = this->votesMenuStrip;
 			this->voteList->LabelEdit = true;
 			this->voteList->Location = System::Drawing::Point(6, 31);
 			this->voteList->Name = L"voteList";
-			this->voteList->Size = System::Drawing::Size(337, 220);
+			this->voteList->Size = System::Drawing::Size(416, 220);
 			this->voteList->TabIndex = 5;
 			this->voteList->UseCompatibleStateImageBehavior = false;
 			this->voteList->View = System::Windows::Forms::View::Details;
+			this->voteList->ColumnClick += gcnew System::Windows::Forms::ColumnClickEventHandler(this, &CompoWindow::voteList_ColumnClick);
+			// 
+			// votesMenuStrip
+			// 
+			this->votesMenuStrip->Items->AddRange(gcnew cli::array< System::Windows::Forms::ToolStripItem^  >(2) {this->addToolStripMenuItem, 
+				this->pasteToolStripMenuItem});
+			this->votesMenuStrip->Name = L"votesMenuStrip";
+			this->votesMenuStrip->RenderMode = System::Windows::Forms::ToolStripRenderMode::System;
+			this->votesMenuStrip->Size = System::Drawing::Size(169, 48);
+			// 
+			// addToolStripMenuItem
+			// 
+			this->addToolStripMenuItem->Name = L"addToolStripMenuItem";
+			this->addToolStripMenuItem->ShortcutKeys = static_cast<System::Windows::Forms::Keys>((System::Windows::Forms::Keys::Control | System::Windows::Forms::Keys::N));
+			this->addToolStripMenuItem->Size = System::Drawing::Size(168, 22);
+			this->addToolStripMenuItem->Text = L"Add New...";
+			this->addToolStripMenuItem->Click += gcnew System::EventHandler(this, &CompoWindow::addToolStripMenuItem_Click);
+			// 
+			// pasteToolStripMenuItem
+			// 
+			this->pasteToolStripMenuItem->Name = L"pasteToolStripMenuItem";
+			this->pasteToolStripMenuItem->ShortcutKeys = static_cast<System::Windows::Forms::Keys>((System::Windows::Forms::Keys::Control | System::Windows::Forms::Keys::V));
+			this->pasteToolStripMenuItem->Size = System::Drawing::Size(168, 22);
+			this->pasteToolStripMenuItem->Text = L"Paste...";
+			this->pasteToolStripMenuItem->Click += gcnew System::EventHandler(this, &CompoWindow::pasteToolStripMenuItem_Click);
 			// 
 			// txtCompoName2
 			// 
@@ -433,17 +452,6 @@ namespace lazyslash {
 			this->exitToolStripMenuItem->Size = System::Drawing::Size(125, 22);
 			this->exitToolStripMenuItem->Text = L"E&xit";
 			// 
-			// zipErrorLabel
-			// 
-			this->zipErrorLabel->Anchor = static_cast<System::Windows::Forms::AnchorStyles>(((System::Windows::Forms::AnchorStyles::Bottom | System::Windows::Forms::AnchorStyles::Left) 
-				| System::Windows::Forms::AnchorStyles::Right));
-			this->zipErrorLabel->AutoSize = true;
-			this->zipErrorLabel->Location = System::Drawing::Point(155, 262);
-			this->zipErrorLabel->Name = L"zipErrorLabel";
-			this->zipErrorLabel->Size = System::Drawing::Size(85, 13);
-			this->zipErrorLabel->TabIndex = 5;
-			this->zipErrorLabel->Text = L"duck duck duck";
-			// 
 			// CompoWindow
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
@@ -461,6 +469,7 @@ namespace lazyslash {
 			this->entriesMenuStrip->ResumeLayout(false);
 			this->tabPage2->ResumeLayout(false);
 			this->tabPage2->PerformLayout();
+			this->votesMenuStrip->ResumeLayout(false);
 			this->mainMenuStrip->ResumeLayout(false);
 			this->mainMenuStrip->PerformLayout();
 			this->ResumeLayout(false);
@@ -507,7 +516,7 @@ namespace lazyslash {
 				}
 				else
 				{
-					this->zipErrorLabel->Text = L"All entries require a full path to zip!";
+					this->zipErrorLabel->Text = L"All entries require a full path for zipping!";
 					this->createzipButton->Enabled = false;
 				}
 			}
@@ -621,6 +630,11 @@ namespace lazyslash {
 
 		private: System::Void removeToolStripMenuItem_Click(System::Object^  sender, System::EventArgs^  e)
 		{
+			if (this->tabControl1->SelectedTab != this->entriesTab)
+			{
+				return;
+			}
+
 			for each (System::Windows::Forms::ListViewItem^ killitem in this->entriesList->SelectedItems)
 			{
 				if (killitem != this->_empty_item)
@@ -694,6 +708,117 @@ namespace lazyslash {
 			}
 			this->entriesList->Sort();
 			this->check_zip_button();
+		}
+
+		private: System::Void tabControl1_Selecting(System::Object^  sender, System::Windows::Forms::TabControlCancelEventArgs^  e)
+		{
+			if ((e->TabPage == entriesTab) && (this->voteList->Columns->Count > 0))
+			{
+				System::Windows::Forms::DialogResult dr;
+				
+
+				dr = System::Windows::Forms::MessageBox::Show(
+					L"Going back to the Entries tab\nwhile you have votes entered\nwill hose the list of votes!\n\nAre you okay with losing all the votes?",
+					L"This program is stupider than you are",
+					System::Windows::Forms::MessageBoxButtons::YesNo);
+
+				if (dr != System::Windows::Forms::DialogResult::Yes)
+				{
+					e->Cancel = true;
+				}
+				else
+				{
+					this->voteList->Items->Clear();
+					this->voteList->Columns->Clear();
+				}
+			}
+		}
+		private: System::Void pasteToolStripMenuItem_Click(System::Object^  sender, System::EventArgs^  e)
+		{
+			if (this->tabControl1->SelectedTab != this->tabPage2)
+			{
+				return;
+			}
+
+			// TODO: accept pastes
+		}
+		
+		private: System::Void get_current_songs_entrants(ArrayList^ songs, ArrayList^ entrants)
+		{
+
+			ArrayList^ already_used_names = gcnew ArrayList;
+
+			
+
+			for each (System::Windows::Forms::ColumnHeader^ ch in this->voteList->Columns)
+			{
+				VoteData^ votes = (VoteData^)(ch->Tag);
+				if (votes->votingfor != L"")
+				{
+					already_used_names->Add(votes->votingfor);
+				}
+			}
+
+			for each (System::Windows::Forms::ListViewItem^ lvi in this->entriesList->Items)
+			{
+				if (lvi != this->_empty_item)
+				{
+					CompoEntry ^ce = (CompoEntry^)(lvi->Tag);
+					songs->Add(ce->filename);
+					
+					if (!already_used_names->Contains(ce->composer))
+					{
+						entrants->Add(ce->composer);
+					}
+				}
+			}
+		}
+
+		private: System::Void addToolStripMenuItem_Click(System::Object^  sender, System::EventArgs^  e)
+		{
+			VoteData^ vd = gcnew VoteData;
+			ArrayList^ entrants = gcnew ArrayList;
+			ArrayList^ songs = gcnew ArrayList;
+
+			get_current_songs_entrants(songs, entrants);
+
+			VoteEntry ve(vd, entrants, songs);
+			
+
+			System::Windows::Forms::DialogResult dr = ve.ShowDialog();
+
+			if (dr == System::Windows::Forms::DialogResult::OK)
+			{
+				System::Windows::Forms::ColumnHeader ^newhead = this->voteList->Columns->Add(vd->votingby);
+				newhead->Tag = vd;
+
+				// TODO: fill votes into list, too...
+			}
+			
+
+		}
+		
+		private: System::Void voteList_ColumnClick(System::Object^  sender, System::Windows::Forms::ColumnClickEventArgs^  e)
+		{
+			VoteData^ vd = (VoteData^)(this->voteList->Columns[e->Column]->Tag);
+			ArrayList^ entrants = gcnew ArrayList;
+			ArrayList^ songs = gcnew ArrayList;
+
+			get_current_songs_entrants(songs, entrants);
+			if (vd->votingfor != L"")
+			{
+				entrants->Add(vd->votingfor);
+			}
+
+			VoteEntry ve(vd, entrants, songs);
+			
+			System::Windows::Forms::DialogResult dr = ve.ShowDialog();
+
+			if (dr == System::Windows::Forms::DialogResult::OK)
+			{
+				// TODO: change list to match edits...
+			}
+
 		}
 };
 
