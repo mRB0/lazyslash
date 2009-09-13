@@ -1,6 +1,9 @@
 #pragma once
 
 #include "TrackerMod.h"
+#include "ListViewItemComparer.h"
+#include "CompoEntry.h"
+#include "EntryEditor.h"
 
 namespace lazyslash {
 
@@ -11,48 +14,6 @@ namespace lazyslash {
 	using namespace System::Data;
 	using namespace System::Drawing;
 	
-	ref class ListViewItemComparer: public IComparer
-	{
-	private:
-		int col;
-		bool ascending;
-		System::Windows::Forms::ListViewItem^ ignoreditem;
-
-	public:
-		ListViewItemComparer()
-		{
-			col = 0;
-		}
-
-		ListViewItemComparer( int column, bool ascending, System::Windows::Forms::ListViewItem^ ignoreditem )
-		{
-			col = column;
-			this->ascending = ascending;
-			this->ignoreditem = ignoreditem;
-		}
-
-		virtual int Compare( Object^ x, Object^ y )
-		{
-			if (ignoreditem == (dynamic_cast<ListViewItem^>(x)))
-			{
-				return 1;
-			}
-			if (ignoreditem == (dynamic_cast<ListViewItem^>(y)))
-			{
-				return -1;
-			}
-
-			int reverse = 1;
-
-			if (!ascending)
-			{
-				reverse = -1;
-			}
-
-			return reverse * String::Compare( (dynamic_cast<ListViewItem^>(x))->SubItems[ col ]->Text,
-								       (dynamic_cast<ListViewItem^>(y))->SubItems[ col ]->Text );
-		}
-	};
 
 	/// <summary>
 	/// Summary for CompoWindow
@@ -90,7 +51,10 @@ namespace lazyslash {
 
 		System::Windows::Forms::ListViewItem^ _empty_item;
 		bool sort_ascending;
-		int sort_col;
+	private: System::Windows::Forms::ContextMenuStrip^  entriesMenuStrip;
+	protected: 
+	private: System::Windows::Forms::ToolStripMenuItem^  removeToolStripMenuItem;
+			 int sort_col;
 
 		/// <summary>
 		/// Clean up any resources being used.
@@ -134,6 +98,7 @@ namespace lazyslash {
 	private: System::Windows::Forms::ListView^  voteList;
 	private: System::Windows::Forms::Button^  exportButton;
 	private: System::Windows::Forms::Button^  viewButton;
+	private: System::ComponentModel::IContainer^  components;
 
 
 	protected: 
@@ -142,7 +107,7 @@ namespace lazyslash {
 		/// <summary>
 		/// Required designer variable.
 		/// </summary>
-		System::ComponentModel::Container ^components;
+
 
 #pragma region Windows Form Designer generated code
 		/// <summary>
@@ -151,6 +116,7 @@ namespace lazyslash {
 		/// </summary>
 		void InitializeComponent(void)
 		{
+			this->components = (gcnew System::ComponentModel::Container());
 			this->tabControl1 = (gcnew System::Windows::Forms::TabControl());
 			this->entriesTab = (gcnew System::Windows::Forms::TabPage());
 			this->createzipButton = (gcnew System::Windows::Forms::Button());
@@ -159,6 +125,8 @@ namespace lazyslash {
 			this->columnHeader1 = (gcnew System::Windows::Forms::ColumnHeader());
 			this->columnHeader2 = (gcnew System::Windows::Forms::ColumnHeader());
 			this->columnHeader3 = (gcnew System::Windows::Forms::ColumnHeader());
+			this->entriesMenuStrip = (gcnew System::Windows::Forms::ContextMenuStrip(this->components));
+			this->removeToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
 			this->txtCompoName1 = (gcnew System::Windows::Forms::TextBox());
 			this->label1 = (gcnew System::Windows::Forms::Label());
 			this->entriesLabel = (gcnew System::Windows::Forms::Label());
@@ -179,6 +147,7 @@ namespace lazyslash {
 			this->exitToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
 			this->tabControl1->SuspendLayout();
 			this->entriesTab->SuspendLayout();
+			this->entriesMenuStrip->SuspendLayout();
 			this->tabPage2->SuspendLayout();
 			this->mainMenuStrip->SuspendLayout();
 			this->SuspendLayout();
@@ -220,6 +189,7 @@ namespace lazyslash {
 			this->createzipButton->TabIndex = 4;
 			this->createzipButton->Text = L"Create votepack .ZIP";
 			this->createzipButton->UseVisualStyleBackColor = true;
+			this->createzipButton->Click += gcnew System::EventHandler(this, &CompoWindow::createzipButton_Click);
 			// 
 			// entriesList
 			// 
@@ -230,6 +200,7 @@ namespace lazyslash {
 				| System::Windows::Forms::AnchorStyles::Right));
 			this->entriesList->Columns->AddRange(gcnew cli::array< System::Windows::Forms::ColumnHeader^  >(4) {this->columnHeader0, 
 				this->columnHeader1, this->columnHeader2, this->columnHeader3});
+			this->entriesList->ContextMenuStrip = this->entriesMenuStrip;
 			this->entriesList->LabelWrap = false;
 			this->entriesList->Location = System::Drawing::Point(6, 31);
 			this->entriesList->Name = L"entriesList";
@@ -237,6 +208,7 @@ namespace lazyslash {
 			this->entriesList->TabIndex = 3;
 			this->entriesList->UseCompatibleStateImageBehavior = false;
 			this->entriesList->View = System::Windows::Forms::View::Details;
+			this->entriesList->ItemActivate += gcnew System::EventHandler(this, &CompoWindow::entriesList_ItemActivate);
 			this->entriesList->SelectedIndexChanged += gcnew System::EventHandler(this, &CompoWindow::entriesList_SelectedIndexChanged);
 			this->entriesList->DragDrop += gcnew System::Windows::Forms::DragEventHandler(this, &CompoWindow::entriesList_Drop);
 			this->entriesList->ColumnClick += gcnew System::Windows::Forms::ColumnClickEventHandler(this, &CompoWindow::entriesList_ColumnClick);
@@ -261,6 +233,22 @@ namespace lazyslash {
 			// 
 			this->columnHeader3->Text = L"Song name";
 			this->columnHeader3->Width = 184;
+			// 
+			// entriesMenuStrip
+			// 
+			this->entriesMenuStrip->Items->AddRange(gcnew cli::array< System::Windows::Forms::ToolStripItem^  >(1) {this->removeToolStripMenuItem});
+			this->entriesMenuStrip->Name = L"entriesMenuStrip";
+			this->entriesMenuStrip->RenderMode = System::Windows::Forms::ToolStripRenderMode::System;
+			this->entriesMenuStrip->Size = System::Drawing::Size(136, 26);
+			this->entriesMenuStrip->Opening += gcnew System::ComponentModel::CancelEventHandler(this, &CompoWindow::entriesMenuStrip_Opening);
+			// 
+			// removeToolStripMenuItem
+			// 
+			this->removeToolStripMenuItem->Name = L"removeToolStripMenuItem";
+			this->removeToolStripMenuItem->ShortcutKeys = System::Windows::Forms::Keys::Delete;
+			this->removeToolStripMenuItem->Size = System::Drawing::Size(135, 22);
+			this->removeToolStripMenuItem->Text = L"Remove";
+			this->removeToolStripMenuItem->Click += gcnew System::EventHandler(this, &CompoWindow::removeToolStripMenuItem_Click);
 			// 
 			// txtCompoName1
 			// 
@@ -400,6 +388,7 @@ namespace lazyslash {
 			// mainMenuStrip
 			// 
 			this->mainMenuStrip->BackColor = System::Drawing::SystemColors::ActiveBorder;
+			this->mainMenuStrip->ImageScalingSize = System::Drawing::Size(0, 0);
 			this->mainMenuStrip->Items->AddRange(gcnew cli::array< System::Windows::Forms::ToolStripItem^  >(1) {this->fileToolStripMenuItem});
 			this->mainMenuStrip->Location = System::Drawing::Point(0, 0);
 			this->mainMenuStrip->Name = L"mainMenuStrip";
@@ -454,6 +443,7 @@ namespace lazyslash {
 			this->tabControl1->ResumeLayout(false);
 			this->entriesTab->ResumeLayout(false);
 			this->entriesTab->PerformLayout();
+			this->entriesMenuStrip->ResumeLayout(false);
 			this->tabPage2->ResumeLayout(false);
 			this->tabPage2->PerformLayout();
 			this->mainMenuStrip->ResumeLayout(false);
@@ -464,6 +454,15 @@ namespace lazyslash {
 		}
 #pragma endregion
 
+		private: System::Void match_entrylist_to_entry(System::Windows::Forms::ListViewItem^ edititem)
+		{
+			CompoEntry^ ce = (CompoEntry^)(edititem->Tag);
+			edititem->SubItems[0]->Text = (ce->voted ? L"yes" : L"NO");
+			edititem->SubItems[1]->Text = ce->composer;
+			edititem->SubItems[2]->Text = System::IO::Path::GetFileName(ce->filespec);
+			edititem->SubItems[3]->Text = ce->songtitle;
+			//ce->songtitle
+		}
 		private: System::Void CompoWindow_Load(System::Object^  sender, System::EventArgs^  e)
 		{
 		}
@@ -502,12 +501,17 @@ namespace lazyslash {
 				String^ filename = System::IO::Path::GetFileName(file);
 
 				String^ songtitle = TrackerMod::GetSongTitle(file)->TrimEnd(0);
-				int songlen = songtitle->Length;
+				//int songlen = songtitle->Length;
+				
+				ListViewItem^ new_item = gcnew ListViewItem(gcnew array<String^>{"", "", filename, songtitle});
+				new_item->Tag = gcnew CompoEntry(file, songtitle);
 
-				this->entriesList->Items->Add(gcnew ListViewItem(gcnew array<String^>{"", songlen.ToString(), filename, songtitle}));
+				this->entriesList->Items->Add(new_item);
+				this->match_entrylist_to_entry(new_item);
 			}
 
 			this->entriesList->Items->Add(_empty_item);
+			this->entriesList->Sort();
 
 		}
 
@@ -550,6 +554,86 @@ namespace lazyslash {
 
 			//this->entriesList->Items->Add(this->_empty_item);
 		}
-	};
+		private: System::Void entriesMenuStrip_Opening(System::Object^  sender, System::ComponentModel::CancelEventArgs^  e)
+		{
+			if ((this->entriesList->SelectedItems->Count > 0) &&
+				!(this->entriesList->SelectedItems->Count == 1 &&
+				this->entriesList->SelectedItems[0] == this->_empty_item))
+			{
+				this->entriesMenuStrip->Items[0]->Enabled = true;
+			}
+			else
+			{
+				this->entriesMenuStrip->Items[0]->Enabled = false;
+			}
+		}
+
+		private: System::Void removeToolStripMenuItem_Click(System::Object^  sender, System::EventArgs^  e)
+		{
+			for each (System::Windows::Forms::ListViewItem^ killitem in this->entriesList->SelectedItems)
+			{
+				if (killitem != this->_empty_item)
+				{
+					this->entriesList->Items->Remove(killitem);
+				}
+			}
+		}
+
+		private: System::Void createzipButton_Click(System::Object^  sender, System::EventArgs^  e)
+		{
+			System::Windows::Forms::SaveFileDialog^ sfd = gcnew System::Windows::Forms::SaveFileDialog;
+			sfd->Filter = "zip files (*.zip)|*.zip|All files (*.*)|*.*";
+			sfd->FilterIndex = 0;
+			sfd->RestoreDirectory = true;
+
+			DateTime^ now = DateTime::Now;
+			sfd->FileName = now->ToString("yyyy-MM-dd\".zip\"");
+
+			if (sfd->ShowDialog() == System::Windows::Forms::DialogResult::OK)
+			{
+				Ionic::Zip::ZipFile^ zf = gcnew Ionic::Zip::ZipFile;
+	
+				
+				for each (System::Windows::Forms::ListViewItem^ additem in this->entriesList->Items)
+				{
+					if (additem != this->_empty_item)
+					{
+						
+						zf->AddFile(((CompoEntry^)additem->Tag)->filespec, L"");
+						
+					}
+				}
+				zf->Save(sfd->FileName);
+	
+				delete zf;
+			}
+		}
+
+		private: System::Void entriesList_ItemActivate(System::Object^  sender, System::EventArgs^  e)
+		{
+			for each (System::Windows::Forms::ListViewItem^ edititem in this->entriesList->SelectedItems)
+			{
+				if (edititem != this->_empty_item)
+				{
+					// edit item
+					EntryEditor ee;
+					ee.ShowDialog();
+
+					((CompoEntry^)(edititem->Tag))->songtitle = L"LOL";
+					// make list entry match CompoEntry tag
+					this->match_entrylist_to_entry(edititem);
+					this->entriesList->Sort();
+				}
+				else
+				{
+					EntryEditor ee;
+					ee.ShowDialog();
+
+				}
+			}
+		}
+};
+
+
 }
 
