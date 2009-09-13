@@ -352,6 +352,7 @@ namespace lazyslash {
 			this->voteList->TabIndex = 5;
 			this->voteList->UseCompatibleStateImageBehavior = false;
 			this->voteList->View = System::Windows::Forms::View::Details;
+			this->voteList->DoubleClick += gcnew System::EventHandler(this, &CompoWindow::voteList_DoubleClick);
 			this->voteList->ColumnClick += gcnew System::Windows::Forms::ColumnClickEventHandler(this, &CompoWindow::voteList_ColumnClick);
 			// 
 			// votesMenuStrip
@@ -719,7 +720,7 @@ namespace lazyslash {
 
 				dr = System::Windows::Forms::MessageBox::Show(
 					L"Going back to the Entries tab\nwhile you have votes entered\nwill hose the list of votes!\n\nAre you okay with losing all the votes?",
-					L"This program is stupider than you are",
+					L"This program is too stupid",
 					System::Windows::Forms::MessageBoxButtons::YesNo);
 
 				if (dr != System::Windows::Forms::DialogResult::Yes)
@@ -774,7 +775,7 @@ namespace lazyslash {
 			}
 		}
 
-		private: System::Void addToolStripMenuItem_Click(System::Object^  sender, System::EventArgs^  e)
+		private: System::Void add_voter(void)
 		{
 			VoteData^ vd = gcnew VoteData;
 			ArrayList^ entrants = gcnew ArrayList;
@@ -791,11 +792,39 @@ namespace lazyslash {
 			{
 				System::Windows::Forms::ColumnHeader ^newhead = this->voteList->Columns->Add(vd->votingby);
 				newhead->Tag = vd;
+				int idx = newhead->Index;
 
-				// TODO: fill votes into list, too...
+				int i=0;
+				for each (System::Windows::Forms::ListViewItem^ lvi in this->voteList->Items)
+				{
+					while (lvi->SubItems->Count < idx+1)
+					{
+						lvi->SubItems->Add(L"");
+					}
+
+					System::Windows::Forms::ListViewItem::ListViewSubItem^ si = lvi->SubItems[idx];
+					si->Text = (String^)(vd->votes[i]);
+					
+					i++;
+				}
+				while (i < vd->votes->Count)
+				{
+					System::Windows::Forms::ListViewItem^ nlvi = this->voteList->Items->Add(L"");
+					
+					while (nlvi->SubItems->Count < idx+1)
+					{
+						nlvi->SubItems->Add(L"");
+					}
+					System::Windows::Forms::ListViewItem::ListViewSubItem^ si = nlvi->SubItems[idx];
+					si->Text = (String^)(vd->votes[i]);
+					i++;
+				}
 			}
-			
 
+		}
+		private: System::Void addToolStripMenuItem_Click(System::Object^  sender, System::EventArgs^  e)
+		{
+			this->add_voter();
 		}
 		
 		private: System::Void voteList_ColumnClick(System::Object^  sender, System::Windows::Forms::ColumnClickEventArgs^  e)
@@ -816,9 +845,42 @@ namespace lazyslash {
 
 			if (dr == System::Windows::Forms::DialogResult::OK)
 			{
-				// TODO: change list to match edits...
+				int idx = e->Column;
+				this->voteList->Columns[idx]->Text = vd->votingby;
+
+				int i=0;
+				for each (System::Windows::Forms::ListViewItem^ lvi in this->voteList->Items)
+				{
+					while (lvi->SubItems->Count < idx+1)
+					{
+						lvi->SubItems->Add(L"");
+					}
+
+					System::Windows::Forms::ListViewItem::ListViewSubItem^ si = lvi->SubItems[idx];
+					si->Text = (String^)(vd->votes[i]);
+					
+					i++;
+				}
+				while (i < vd->votes->Count)
+				{
+					System::Windows::Forms::ListViewItem^ nlvi = this->voteList->Items->Add(L"");
+					
+					while (nlvi->SubItems->Count < idx+1)
+					{
+						nlvi->SubItems->Add(L"");
+					}
+					System::Windows::Forms::ListViewItem::ListViewSubItem^ si = nlvi->SubItems[idx];
+					si->Text = (String^)(vd->votes[i]);
+					i++;
+				}
+				
 			}
 
+		}
+
+		private: System::Void voteList_DoubleClick(System::Object^  sender, System::EventArgs^  e)
+		{
+			this->add_voter();
 		}
 };
 
