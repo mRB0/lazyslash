@@ -10,6 +10,49 @@ namespace lazyslash {
 	using namespace System::Windows::Forms;
 	using namespace System::Data;
 	using namespace System::Drawing;
+	
+	ref class ListViewItemComparer: public IComparer
+	{
+	private:
+		int col;
+		bool ascending;
+		System::Windows::Forms::ListViewItem^ ignoreditem;
+
+	public:
+		ListViewItemComparer()
+		{
+			col = 0;
+		}
+
+		ListViewItemComparer( int column, bool ascending, System::Windows::Forms::ListViewItem^ ignoreditem )
+		{
+			col = column;
+			this->ascending = ascending;
+			this->ignoreditem = ignoreditem;
+		}
+
+		virtual int Compare( Object^ x, Object^ y )
+		{
+			if (ignoreditem == (dynamic_cast<ListViewItem^>(x)))
+			{
+				return 1;
+			}
+			if (ignoreditem == (dynamic_cast<ListViewItem^>(y)))
+			{
+				return -1;
+			}
+
+			int reverse = 1;
+
+			if (!ascending)
+			{
+				reverse = -1;
+			}
+
+			return reverse * String::Compare( (dynamic_cast<ListViewItem^>(x))->SubItems[ col ]->Text,
+								       (dynamic_cast<ListViewItem^>(y))->SubItems[ col ]->Text );
+		}
+	};
 
 	/// <summary>
 	/// Summary for CompoWindow
@@ -26,12 +69,29 @@ namespace lazyslash {
 		CompoWindow(void)
 		{
 			InitializeComponent();
+			this->entriesList->FullRowSelect = true;
+			
+			_empty_item = gcnew System::Windows::Forms::ListViewItem(gcnew array<String^>{L"", L"", L"(add new)", L""});
+
+			this->entriesList->Items->Add(_empty_item);
+
+			sort_ascending = true;
+			sort_col = 2;
+
+			this->entriesList->ListViewItemSorter = gcnew ListViewItemComparer(sort_col, sort_ascending, this->_empty_item);
+
+
 			//
 			//TODO: Add the constructor code here
 			//
 		}
 
 	protected:
+
+		System::Windows::Forms::ListViewItem^ _empty_item;
+		bool sort_ascending;
+		int sort_col;
+
 		/// <summary>
 		/// Clean up any resources being used.
 		/// </summary>
@@ -50,10 +110,12 @@ namespace lazyslash {
 	private: System::Windows::Forms::TabPage^  tabPage2;
 	private: System::Windows::Forms::Label^  entriesLabel;
 	private: System::Windows::Forms::Label^  label1;
-	private: System::Windows::Forms::TextBox^  textBox1;
+	private: System::Windows::Forms::TextBox^  txtCompoName1;
+
 	private: System::Windows::Forms::ListView^  entriesList;
 	private: System::Windows::Forms::Button^  createzipButton;
-	private: System::Windows::Forms::MenuStrip^  menuStrip1;
+	private: System::Windows::Forms::MenuStrip^  mainMenuStrip;
+
 	private: System::Windows::Forms::ToolStripMenuItem^  fileToolStripMenuItem;
 	private: System::Windows::Forms::ToolStripMenuItem^  newToolStripMenuItem;
 	private: System::Windows::Forms::ToolStripMenuItem^  saveToolStripMenuItem;
@@ -63,7 +125,8 @@ namespace lazyslash {
 	private: System::Windows::Forms::ColumnHeader^  columnHeader1;
 	private: System::Windows::Forms::ColumnHeader^  columnHeader2;
 	private: System::Windows::Forms::ColumnHeader^  columnHeader3;
-	private: System::Windows::Forms::TextBox^  textBox2;
+	private: System::Windows::Forms::TextBox^  txtCompoName2;
+
 	private: System::Windows::Forms::Label^  label3;
 	private: System::Windows::Forms::Label^  label2;
 	private: System::Windows::Forms::Button^  pasteButton;
@@ -96,7 +159,7 @@ namespace lazyslash {
 			this->columnHeader1 = (gcnew System::Windows::Forms::ColumnHeader());
 			this->columnHeader2 = (gcnew System::Windows::Forms::ColumnHeader());
 			this->columnHeader3 = (gcnew System::Windows::Forms::ColumnHeader());
-			this->textBox1 = (gcnew System::Windows::Forms::TextBox());
+			this->txtCompoName1 = (gcnew System::Windows::Forms::TextBox());
 			this->label1 = (gcnew System::Windows::Forms::Label());
 			this->entriesLabel = (gcnew System::Windows::Forms::Label());
 			this->tabPage2 = (gcnew System::Windows::Forms::TabPage());
@@ -105,10 +168,10 @@ namespace lazyslash {
 			this->pasteButton = (gcnew System::Windows::Forms::Button());
 			this->addVoterButton = (gcnew System::Windows::Forms::Button());
 			this->voteList = (gcnew System::Windows::Forms::ListView());
-			this->textBox2 = (gcnew System::Windows::Forms::TextBox());
+			this->txtCompoName2 = (gcnew System::Windows::Forms::TextBox());
 			this->label3 = (gcnew System::Windows::Forms::Label());
 			this->label2 = (gcnew System::Windows::Forms::Label());
-			this->menuStrip1 = (gcnew System::Windows::Forms::MenuStrip());
+			this->mainMenuStrip = (gcnew System::Windows::Forms::MenuStrip());
 			this->fileToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
 			this->newToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
 			this->saveToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
@@ -117,7 +180,7 @@ namespace lazyslash {
 			this->tabControl1->SuspendLayout();
 			this->entriesTab->SuspendLayout();
 			this->tabPage2->SuspendLayout();
-			this->menuStrip1->SuspendLayout();
+			this->mainMenuStrip->SuspendLayout();
 			this->SuspendLayout();
 			// 
 			// tabControl1
@@ -137,13 +200,13 @@ namespace lazyslash {
 			// 
 			this->entriesTab->Controls->Add(this->createzipButton);
 			this->entriesTab->Controls->Add(this->entriesList);
-			this->entriesTab->Controls->Add(this->textBox1);
+			this->entriesTab->Controls->Add(this->txtCompoName1);
 			this->entriesTab->Controls->Add(this->label1);
 			this->entriesTab->Controls->Add(this->entriesLabel);
 			this->entriesTab->Location = System::Drawing::Point(4, 22);
 			this->entriesTab->Name = L"entriesTab";
 			this->entriesTab->Padding = System::Windows::Forms::Padding(3);
-			this->entriesTab->Size = System::Drawing::Size(406, 276);
+			this->entriesTab->Size = System::Drawing::Size(430, 288);
 			this->entriesTab->TabIndex = 0;
 			this->entriesTab->Text = L"Entries";
 			this->entriesTab->UseVisualStyleBackColor = true;
@@ -151,7 +214,7 @@ namespace lazyslash {
 			// createzipButton
 			// 
 			this->createzipButton->Anchor = static_cast<System::Windows::Forms::AnchorStyles>((System::Windows::Forms::AnchorStyles::Bottom | System::Windows::Forms::AnchorStyles::Left));
-			this->createzipButton->Location = System::Drawing::Point(7, 247);
+			this->createzipButton->Location = System::Drawing::Point(6, 257);
 			this->createzipButton->Name = L"createzipButton";
 			this->createzipButton->Size = System::Drawing::Size(143, 23);
 			this->createzipButton->TabIndex = 4;
@@ -160,20 +223,23 @@ namespace lazyslash {
 			// 
 			// entriesList
 			// 
+			this->entriesList->AllowColumnReorder = true;
 			this->entriesList->AllowDrop = true;
 			this->entriesList->Anchor = static_cast<System::Windows::Forms::AnchorStyles>((((System::Windows::Forms::AnchorStyles::Top | System::Windows::Forms::AnchorStyles::Bottom) 
 				| System::Windows::Forms::AnchorStyles::Left) 
 				| System::Windows::Forms::AnchorStyles::Right));
 			this->entriesList->Columns->AddRange(gcnew cli::array< System::Windows::Forms::ColumnHeader^  >(4) {this->columnHeader0, 
 				this->columnHeader1, this->columnHeader2, this->columnHeader3});
+			this->entriesList->LabelWrap = false;
 			this->entriesList->Location = System::Drawing::Point(6, 31);
 			this->entriesList->Name = L"entriesList";
-			this->entriesList->Size = System::Drawing::Size(394, 210);
+			this->entriesList->Size = System::Drawing::Size(416, 220);
 			this->entriesList->TabIndex = 3;
 			this->entriesList->UseCompatibleStateImageBehavior = false;
 			this->entriesList->View = System::Windows::Forms::View::Details;
 			this->entriesList->SelectedIndexChanged += gcnew System::EventHandler(this, &CompoWindow::entriesList_SelectedIndexChanged);
 			this->entriesList->DragDrop += gcnew System::Windows::Forms::DragEventHandler(this, &CompoWindow::entriesList_Drop);
+			this->entriesList->ColumnClick += gcnew System::Windows::Forms::ColumnClickEventHandler(this, &CompoWindow::entriesList_ColumnClick);
 			this->entriesList->DragEnter += gcnew System::Windows::Forms::DragEventHandler(this, &CompoWindow::entriesList_DragEnter);
 			// 
 			// columnHeader0
@@ -196,14 +262,15 @@ namespace lazyslash {
 			this->columnHeader3->Text = L"Song name";
 			this->columnHeader3->Width = 184;
 			// 
-			// textBox1
+			// txtCompoName1
 			// 
-			this->textBox1->Anchor = static_cast<System::Windows::Forms::AnchorStyles>(((System::Windows::Forms::AnchorStyles::Top | System::Windows::Forms::AnchorStyles::Left) 
+			this->txtCompoName1->Anchor = static_cast<System::Windows::Forms::AnchorStyles>(((System::Windows::Forms::AnchorStyles::Top | System::Windows::Forms::AnchorStyles::Left) 
 				| System::Windows::Forms::AnchorStyles::Right));
-			this->textBox1->Location = System::Drawing::Point(188, 5);
-			this->textBox1->Name = L"textBox1";
-			this->textBox1->Size = System::Drawing::Size(212, 20);
-			this->textBox1->TabIndex = 2;
+			this->txtCompoName1->Location = System::Drawing::Point(188, 5);
+			this->txtCompoName1->Name = L"txtCompoName1";
+			this->txtCompoName1->Size = System::Drawing::Size(234, 20);
+			this->txtCompoName1->TabIndex = 2;
+			this->txtCompoName1->TextChanged += gcnew System::EventHandler(this, &CompoWindow::txtCompoName1_TextChanged);
 			// 
 			// label1
 			// 
@@ -232,7 +299,7 @@ namespace lazyslash {
 			this->tabPage2->Controls->Add(this->pasteButton);
 			this->tabPage2->Controls->Add(this->addVoterButton);
 			this->tabPage2->Controls->Add(this->voteList);
-			this->tabPage2->Controls->Add(this->textBox2);
+			this->tabPage2->Controls->Add(this->txtCompoName2);
 			this->tabPage2->Controls->Add(this->label3);
 			this->tabPage2->Controls->Add(this->label2);
 			this->tabPage2->Location = System::Drawing::Point(4, 22);
@@ -246,7 +313,7 @@ namespace lazyslash {
 			// exportButton
 			// 
 			this->exportButton->Anchor = static_cast<System::Windows::Forms::AnchorStyles>((System::Windows::Forms::AnchorStyles::Bottom | System::Windows::Forms::AnchorStyles::Left));
-			this->exportButton->Location = System::Drawing::Point(88, 259);
+			this->exportButton->Location = System::Drawing::Point(87, 257);
 			this->exportButton->Name = L"exportButton";
 			this->exportButton->Size = System::Drawing::Size(75, 23);
 			this->exportButton->TabIndex = 9;
@@ -256,7 +323,7 @@ namespace lazyslash {
 			// viewButton
 			// 
 			this->viewButton->Anchor = static_cast<System::Windows::Forms::AnchorStyles>((System::Windows::Forms::AnchorStyles::Bottom | System::Windows::Forms::AnchorStyles::Left));
-			this->viewButton->Location = System::Drawing::Point(7, 259);
+			this->viewButton->Location = System::Drawing::Point(6, 257);
 			this->viewButton->Name = L"viewButton";
 			this->viewButton->Size = System::Drawing::Size(75, 23);
 			this->viewButton->TabIndex = 8;
@@ -292,21 +359,23 @@ namespace lazyslash {
 			this->voteList->Anchor = static_cast<System::Windows::Forms::AnchorStyles>((((System::Windows::Forms::AnchorStyles::Top | System::Windows::Forms::AnchorStyles::Bottom) 
 				| System::Windows::Forms::AnchorStyles::Left) 
 				| System::Windows::Forms::AnchorStyles::Right));
+			this->voteList->LabelEdit = true;
 			this->voteList->Location = System::Drawing::Point(6, 31);
 			this->voteList->Name = L"voteList";
-			this->voteList->Size = System::Drawing::Size(337, 222);
+			this->voteList->Size = System::Drawing::Size(337, 220);
 			this->voteList->TabIndex = 5;
 			this->voteList->UseCompatibleStateImageBehavior = false;
 			this->voteList->View = System::Windows::Forms::View::Details;
 			// 
-			// textBox2
+			// txtCompoName2
 			// 
-			this->textBox2->Anchor = static_cast<System::Windows::Forms::AnchorStyles>(((System::Windows::Forms::AnchorStyles::Top | System::Windows::Forms::AnchorStyles::Left) 
+			this->txtCompoName2->Anchor = static_cast<System::Windows::Forms::AnchorStyles>(((System::Windows::Forms::AnchorStyles::Top | System::Windows::Forms::AnchorStyles::Left) 
 				| System::Windows::Forms::AnchorStyles::Right));
-			this->textBox2->Location = System::Drawing::Point(188, 5);
-			this->textBox2->Name = L"textBox2";
-			this->textBox2->Size = System::Drawing::Size(236, 20);
-			this->textBox2->TabIndex = 4;
+			this->txtCompoName2->Location = System::Drawing::Point(188, 5);
+			this->txtCompoName2->Name = L"txtCompoName2";
+			this->txtCompoName2->Size = System::Drawing::Size(236, 20);
+			this->txtCompoName2->TabIndex = 4;
+			this->txtCompoName2->TextChanged += gcnew System::EventHandler(this, &CompoWindow::txtCompoName2_TextChanged);
 			// 
 			// label3
 			// 
@@ -328,16 +397,16 @@ namespace lazyslash {
 			this->label2->TabIndex = 0;
 			this->label2->Text = L"Voters";
 			// 
-			// menuStrip1
+			// mainMenuStrip
 			// 
-			this->menuStrip1->BackColor = System::Drawing::SystemColors::ActiveBorder;
-			this->menuStrip1->Items->AddRange(gcnew cli::array< System::Windows::Forms::ToolStripItem^  >(1) {this->fileToolStripMenuItem});
-			this->menuStrip1->Location = System::Drawing::Point(0, 0);
-			this->menuStrip1->Name = L"menuStrip1";
-			this->menuStrip1->RenderMode = System::Windows::Forms::ToolStripRenderMode::System;
-			this->menuStrip1->Size = System::Drawing::Size(438, 24);
-			this->menuStrip1->TabIndex = 1;
-			this->menuStrip1->Text = L"menuStrip1";
+			this->mainMenuStrip->BackColor = System::Drawing::SystemColors::ActiveBorder;
+			this->mainMenuStrip->Items->AddRange(gcnew cli::array< System::Windows::Forms::ToolStripItem^  >(1) {this->fileToolStripMenuItem});
+			this->mainMenuStrip->Location = System::Drawing::Point(0, 0);
+			this->mainMenuStrip->Name = L"mainMenuStrip";
+			this->mainMenuStrip->RenderMode = System::Windows::Forms::ToolStripRenderMode::System;
+			this->mainMenuStrip->Size = System::Drawing::Size(438, 24);
+			this->mainMenuStrip->TabIndex = 1;
+			this->mainMenuStrip->Text = L"menuStrip1";
 			// 
 			// fileToolStripMenuItem
 			// 
@@ -377,8 +446,8 @@ namespace lazyslash {
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
 			this->ClientSize = System::Drawing::Size(438, 341);
 			this->Controls->Add(this->tabControl1);
-			this->Controls->Add(this->menuStrip1);
-			this->MainMenuStrip = this->menuStrip1;
+			this->Controls->Add(this->mainMenuStrip);
+			this->MainMenuStrip = this->mainMenuStrip;
 			this->Name = L"CompoWindow";
 			this->Text = L"CompoWindow";
 			this->Load += gcnew System::EventHandler(this, &CompoWindow::CompoWindow_Load);
@@ -387,8 +456,8 @@ namespace lazyslash {
 			this->entriesTab->PerformLayout();
 			this->tabPage2->ResumeLayout(false);
 			this->tabPage2->PerformLayout();
-			this->menuStrip1->ResumeLayout(false);
-			this->menuStrip1->PerformLayout();
+			this->mainMenuStrip->ResumeLayout(false);
+			this->mainMenuStrip->PerformLayout();
 			this->ResumeLayout(false);
 			this->PerformLayout();
 
@@ -425,15 +494,21 @@ namespace lazyslash {
 			}
 
 			files = (array<String^>^)(e->Data->GetData(System::Windows::Forms::DataFormats::FileDrop));
+			
+			this->entriesList->Items->Remove(this->_empty_item);
 
 			for each (String^ file in files)
 			{
 				String^ filename = System::IO::Path::GetFileName(file);
 
-				String^ songtitle = TrackerMod::GetSongTitle(file)->TrimEnd(nullptr);
-				
-				this->entriesList->Items->Add(gcnew ListViewItem(gcnew array<String^>{"", "", filename, songtitle}));
+				String^ songtitle = TrackerMod::GetSongTitle(file)->TrimEnd(0);
+				int songlen = songtitle->Length;
+
+				this->entriesList->Items->Add(gcnew ListViewItem(gcnew array<String^>{"", songlen.ToString(), filename, songtitle}));
 			}
+
+			this->entriesList->Items->Add(_empty_item);
+
 		}
 
 		private: System::Void addVoterButton_Click(System::Object^  sender, System::EventArgs^  e)
@@ -444,6 +519,37 @@ namespace lazyslash {
 		{
 		}
 
+		private: System::Void txtCompoName2_TextChanged(System::Object^  sender, System::EventArgs^  e)
+		{
+			txtCompoName1->Text = txtCompoName2->Text;
+		}
+
+		private: System::Void txtCompoName1_TextChanged(System::Object^  sender, System::EventArgs^  e)
+		{
+			txtCompoName2->Text = txtCompoName1->Text;
+		}
+		private: System::Void entriesList_ColumnClick(System::Object^  sender, System::Windows::Forms::ColumnClickEventArgs^  e)
+		{
+			
+			//this->entriesList->Items->Remove(this->_empty_item);
+
+			//this->entriesList->Sort();
+			
+			if (e->Column == sort_col)
+			{
+				sort_ascending = !sort_ascending;
+			}
+			else
+			{
+				sort_col = e->Column;
+				sort_ascending = true;
+			}
+			this->entriesList->ListViewItemSorter = gcnew ListViewItemComparer(sort_col, sort_ascending, this->_empty_item);
+			//this->entriesList->ListViewItemSorter = nullptr;
+
+
+			//this->entriesList->Items->Add(this->_empty_item);
+		}
 	};
 }
 
