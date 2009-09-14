@@ -24,7 +24,7 @@ namespace lazyslash {
 	public ref class EntryEditor : public System::Windows::Forms::Form
 	{
 	public:
-		EntryEditor(CompoEntry^ ce)
+		EntryEditor(CompoEntry^ ce, ArrayList ^compoentries)
 		{
 			InitializeComponent();
 			//
@@ -35,6 +35,7 @@ namespace lazyslash {
 			this->AcceptButton = this->okButton;
 			
 			this->ce = ce;
+			this->compoentries = compoentries;
 			
 			this->fullpathBox->Text = this->ce->filespec;
 			this->titleField->Text = this->ce->songtitle;
@@ -44,6 +45,7 @@ namespace lazyslash {
 
 	protected:
 		CompoEntry ^ce;
+		ArrayList ^compoentries;
 
 		/// <summary>
 		/// Clean up any resources being used.
@@ -203,6 +205,40 @@ namespace lazyslash {
 
 		private: System::Void okButton_Click(System::Object^  sender, System::EventArgs^  e)
 		{
+			if (this->nickField->Text == L"")
+			{
+				System::Windows::Forms::MessageBox::Show(
+					L"Nick can't be left blank.",
+					L"Blast it all!",
+					System::Windows::Forms::MessageBoxButtons::OK);
+				return;
+			}
+
+			for each (CompoEntry ^other in this->compoentries)
+			{
+				if (this->ce == other)
+				{
+					continue;
+				}
+
+				if (this->filenameField->Text == other->filename)
+				{
+					System::Windows::Forms::MessageBox::Show(
+						L"Filename matches another entry.",
+						L"Malarky!",
+						System::Windows::Forms::MessageBoxButtons::OK);
+					return;
+				}
+				if (this->nickField->Text == other->composer)
+				{
+					System::Windows::Forms::MessageBox::Show(
+						L"Nick matches another entry.",
+						L"Hogwash!",
+						System::Windows::Forms::MessageBoxButtons::OK);
+					return;
+				}
+			}
+
 			this->ce->filespec = this->fullpathBox->Text;
 			this->ce->songtitle = this->titleField->Text;
 			this->ce->filename = this->filenameField->Text;
