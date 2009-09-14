@@ -34,6 +34,9 @@ namespace lazyslash {
 		CompoWindow(void)
 		{
 			InitializeComponent();
+
+			zipfilePath = nullptr;
+
 			this->entriesList->FullRowSelect = true;
 			
 			_empty_item = gcnew System::Windows::Forms::ListViewItem(gcnew array<String^>{L"", L"", L"(add new)", L""});
@@ -53,6 +56,8 @@ namespace lazyslash {
 		}
 
 	protected:
+
+		String^ zipfilePath;
 
 		System::Windows::Forms::ListViewItem^ _empty_item;
 		bool sort_ascending;
@@ -204,6 +209,7 @@ namespace lazyslash {
 			this->zipErrorLabel->Size = System::Drawing::Size(85, 13);
 			this->zipErrorLabel->TabIndex = 5;
 			this->zipErrorLabel->Text = L"duck duck duck";
+			this->zipErrorLabel->Click += gcnew System::EventHandler(this, &CompoWindow::zipErrorLabel_Click);
 			// 
 			// createzipButton
 			// 
@@ -524,6 +530,27 @@ namespace lazyslash {
 					this->zipErrorLabel->Text = L"All entries require a full path for zipping!";
 					this->createzipButton->Enabled = false;
 				}
+
+			}
+
+			if (this->zipfilePath != nullptr)
+			{
+				this->zipErrorLabel->Text = "Open containing folder";
+				//this->zipErrorLabel->Enabled = true;
+				this->zipErrorLabel->Cursor = System::Windows::Forms::Cursors::Hand;
+				this->zipErrorLabel->ForeColor = System::Drawing::Color::Blue;
+				this->zipErrorLabel->Font = gcnew System::Drawing::Font(
+					this->zipErrorLabel->Font->Name,
+					this->zipErrorLabel->Font->Size,
+					System::Drawing::FontStyle::Underline,
+					this->zipErrorLabel->Font->Unit);
+				
+			}
+			else
+			{
+				//this->zipErrorLabel->Enabled = false;
+				this->zipErrorLabel->Cursor = System::Windows::Forms::Cursors::Default;
+				this->zipErrorLabel->ForeColor = System::Drawing::Color::Black;
 			}
 		}
 
@@ -647,10 +674,10 @@ namespace lazyslash {
 			System::Windows::Forms::SaveFileDialog^ sfd = gcnew System::Windows::Forms::SaveFileDialog;
 			sfd->Filter = "zip files (*.zip)|*.zip|All files (*.*)|*.*";
 			sfd->FilterIndex = 0;
-			sfd->RestoreDirectory = true;
+			//sfd->RestoreDirectory = true;
 
 			DateTime^ now = DateTime::Now;
-			sfd->FileName = now->ToString("yyyy-MM-dd\".zip\"");
+			sfd->FileName = now->ToString("yyyy-MM-dd \"votepack.zip\"");
 
 			if (sfd->ShowDialog() == System::Windows::Forms::DialogResult::OK)
 			{
@@ -669,7 +696,11 @@ namespace lazyslash {
 				zf->Save(sfd->FileName);
 	
 				delete zf;
+
+				this->zipfilePath = sfd->FileName;
 			}
+
+			this->check_zip_button();
 		}
 
 		private: System::Void entriesList_ItemActivate(System::Object^  sender, System::EventArgs^  e)
@@ -910,7 +941,28 @@ namespace lazyslash {
 		}
 		private: System::Void exportButton_Click(System::Object^  sender, System::EventArgs^  e)
 		{
+			System::Windows::Forms::SaveFileDialog^ sfd = gcnew System::Windows::Forms::SaveFileDialog;
+			sfd->Filter = "txt files (*.txt)|*.txt|All files (*.*)|*.*";
+			sfd->FilterIndex = 0;
+			DateTime^ now = DateTime::Now;
+			sfd->FileName = now->ToString("yyyy-MM-dd \"results.txt\"");
 
+			if (sfd->ShowDialog() == System::Windows::Forms::DialogResult::OK)
+			{
+				System::IO::StreamWriter^ outf = gcnew System::IO::StreamWriter(sfd->FileName);
+
+				outf->Write(calc_results());
+
+				outf->Close();
+			}
+
+		}
+		private: System::Void zipErrorLabel_Click(System::Object^  sender, System::EventArgs^  e)
+		{
+			if (this->zipfilePath != nullptr)
+			{
+				Process::Start("explorer.exe", "/e,/select,"+this->zipfilePath);
+			}
 		}
 };
 
