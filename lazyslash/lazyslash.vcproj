@@ -284,6 +284,28 @@
 				>
 			</File>
 			<File
+				RelativePath=".\ResultsCalc.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ResultsCalc.h"
+				FileType="1"
+				>
+			</File>
+			<File
+				RelativePath=".\ResultsDisplay.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ResultsDisplay.h"
+				FileType="3"
+				>
+				<File
+					RelativePath=".\ResultsDisplay.resx"
+					>
+				</File>
+			</File>
+			<File
 				RelativePath=".\stdafx.h"
 				>
 			</File>
