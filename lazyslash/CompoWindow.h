@@ -37,6 +37,7 @@ namespace lazyslash {
 			InitializeComponent();
 
 			zipfilePath = nullptr;
+			txtfilePath = nullptr;
 
 			this->entriesList->FullRowSelect = true;
 			this->voteList->FullRowSelect = true;
@@ -60,6 +61,7 @@ namespace lazyslash {
 	protected:
 
 		String^ zipfilePath;
+		String^ txtfilePath;
 
 		System::Windows::Forms::ListViewItem^ _empty_item;
 		bool sort_ascending;
@@ -71,6 +73,7 @@ namespace lazyslash {
 	private: System::Windows::Forms::ToolStripMenuItem^  pasteToolStripMenuItem;
 	private: System::Windows::Forms::ToolStripMenuItem^  addToolStripMenuItem;
 	private: System::Windows::Forms::ToolStripMenuItem^  aboutToolStripMenuItem;
+	private: System::Windows::Forms::Label^  exportTxtLabel;
 			 int sort_col;
 
 		/// <summary>
@@ -165,6 +168,7 @@ namespace lazyslash {
 			this->saveAsToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
 			this->exitToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
 			this->aboutToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
+			this->exportTxtLabel = (gcnew System::Windows::Forms::Label());
 			this->tabControl1->SuspendLayout();
 			this->entriesTab->SuspendLayout();
 			this->entriesMenuStrip->SuspendLayout();
@@ -317,6 +321,7 @@ namespace lazyslash {
 			// 
 			// tabPage2
 			// 
+			this->tabPage2->Controls->Add(this->exportTxtLabel);
 			this->tabPage2->Controls->Add(this->exportButton);
 			this->tabPage2->Controls->Add(this->viewButton);
 			this->tabPage2->Controls->Add(this->voteList);
@@ -375,7 +380,7 @@ namespace lazyslash {
 				this->pasteToolStripMenuItem});
 			this->votesMenuStrip->Name = L"votesMenuStrip";
 			this->votesMenuStrip->RenderMode = System::Windows::Forms::ToolStripRenderMode::System;
-			this->votesMenuStrip->Size = System::Drawing::Size(169, 70);
+			this->votesMenuStrip->Size = System::Drawing::Size(169, 48);
 			// 
 			// addToolStripMenuItem
 			// 
@@ -480,6 +485,20 @@ namespace lazyslash {
 			this->aboutToolStripMenuItem->Size = System::Drawing::Size(48, 20);
 			this->aboutToolStripMenuItem->Text = L"&About";
 			this->aboutToolStripMenuItem->Click += gcnew System::EventHandler(this, &CompoWindow::aboutToolStripMenuItem_Click);
+			// 
+			// exportTxtLabel
+			// 
+			this->exportTxtLabel->AutoSize = true;
+			this->exportTxtLabel->Enabled = false;
+			this->exportTxtLabel->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 8.25F, System::Drawing::FontStyle::Underline, 
+				System::Drawing::GraphicsUnit::Point, static_cast<System::Byte>(0)));
+			this->exportTxtLabel->ForeColor = System::Drawing::Color::Blue;
+			this->exportTxtLabel->Location = System::Drawing::Point(168, 262);
+			this->exportTxtLabel->Name = L"exportTxtLabel";
+			this->exportTxtLabel->Size = System::Drawing::Size(114, 13);
+			this->exportTxtLabel->TabIndex = 10;
+			this->exportTxtLabel->Text = L"Open containing folder";
+			this->exportTxtLabel->Click += gcnew System::EventHandler(this, &CompoWindow::exportTxtLabel_Click);
 			// 
 			// CompoWindow
 			// 
@@ -991,6 +1010,10 @@ namespace lazyslash {
 				outf->Write(calc_results());
 
 				outf->Close();
+
+				this->txtfilePath = sfd->FileName;
+				this->exportTxtLabel->Enabled = true;
+				this->exportTxtLabel->Cursor = System::Windows::Forms::Cursors::Hand;
 			}
 
 		}
@@ -1011,6 +1034,13 @@ namespace lazyslash {
 				L"lazyslash compomagoo " + compoversion::version + "\ncompo management system\n\n(c) 2009 Mike Burke (mrb)\nmrburke@gmail.com",
 				L"Aboot",
 				System::Windows::Forms::MessageBoxButtons::OK);
+		}
+		private: System::Void exportTxtLabel_Click(System::Object^  sender, System::EventArgs^  e)
+		{
+			if (this->txtfilePath != nullptr)
+			{
+				Process::Start("explorer.exe", "/e,/select,"+this->txtfilePath);
+			}
 		}
 };
 
