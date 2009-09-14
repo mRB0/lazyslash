@@ -53,12 +53,65 @@ namespace lazyslash {
 
 			this->check_zip_button();
 
-			//
-			//TODO: Add the constructor code here
-			//
+		}
+
+		public: int levenshtein(String^ s, String^ t)
+		{
+			s = s->ToLower();
+			t = t->ToLower();
+
+			// d is a table with m+1 rows and n+1 columns
+			array<int,2>^ d = gcnew array<int,2>(s->Length+1, t->Length+1);
+
+			int i, j;
+
+			for (i=0; i < s->Length+1; i++)
+			{
+				d[i, 0] = i; // deletion
+			}
+			for (j=0; j < t->Length+1; j++)
+			{
+				d[0, j] = j; // insertion
+			}
+
+			for (j=1; j < t->Length+1; j++)
+			{
+				for (i=1; i < s->Length+1; i++)
+				{
+					
+					if (s[i-1] == t[j-1])
+					{
+						d[i, j] = d[i-1, j-1];
+					}
+					else
+					{
+						int del = d[i-1, j] + 1;   // deletion
+						int ins = d[i, j-1] + 1;   // insertion
+						int sub = d[i-1, j-1] + 1; // substitution
+
+						if (del < ins && del < sub)
+						{
+							d[i, j] = del;
+						}
+						else if (ins < sub)
+						{
+							d[i, j] = ins;
+						}
+						else
+						{
+							d[i, j] = sub;
+						}
+					}
+				
+				}
+			}
+
+			return d[s->Length, t->Length];
 		}
 
 	protected:
+
+		static int leven_threshold = 3;
 
 		String^ zipfilePath;
 		String^ txtfilePath;
@@ -152,6 +205,7 @@ namespace lazyslash {
 			this->label1 = (gcnew System::Windows::Forms::Label());
 			this->entriesLabel = (gcnew System::Windows::Forms::Label());
 			this->tabPage2 = (gcnew System::Windows::Forms::TabPage());
+			this->exportTxtLabel = (gcnew System::Windows::Forms::Label());
 			this->exportButton = (gcnew System::Windows::Forms::Button());
 			this->viewButton = (gcnew System::Windows::Forms::Button());
 			this->voteList = (gcnew System::Windows::Forms::ListView());
@@ -168,7 +222,6 @@ namespace lazyslash {
 			this->saveAsToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
 			this->exitToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
 			this->aboutToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
-			this->exportTxtLabel = (gcnew System::Windows::Forms::Label());
 			this->tabControl1->SuspendLayout();
 			this->entriesTab->SuspendLayout();
 			this->entriesMenuStrip->SuspendLayout();
@@ -336,6 +389,20 @@ namespace lazyslash {
 			this->tabPage2->Text = L"Voters";
 			this->tabPage2->UseVisualStyleBackColor = true;
 			// 
+			// exportTxtLabel
+			// 
+			this->exportTxtLabel->AutoSize = true;
+			this->exportTxtLabel->Enabled = false;
+			this->exportTxtLabel->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 8.25F, System::Drawing::FontStyle::Underline, 
+				System::Drawing::GraphicsUnit::Point, static_cast<System::Byte>(0)));
+			this->exportTxtLabel->ForeColor = System::Drawing::Color::Blue;
+			this->exportTxtLabel->Location = System::Drawing::Point(168, 262);
+			this->exportTxtLabel->Name = L"exportTxtLabel";
+			this->exportTxtLabel->Size = System::Drawing::Size(114, 13);
+			this->exportTxtLabel->TabIndex = 10;
+			this->exportTxtLabel->Text = L"Open containing folder";
+			this->exportTxtLabel->Click += gcnew System::EventHandler(this, &CompoWindow::exportTxtLabel_Click);
+			// 
 			// exportButton
 			// 
 			this->exportButton->Anchor = static_cast<System::Windows::Forms::AnchorStyles>((System::Windows::Forms::AnchorStyles::Bottom | System::Windows::Forms::AnchorStyles::Left));
@@ -380,7 +447,7 @@ namespace lazyslash {
 				this->pasteToolStripMenuItem});
 			this->votesMenuStrip->Name = L"votesMenuStrip";
 			this->votesMenuStrip->RenderMode = System::Windows::Forms::ToolStripRenderMode::System;
-			this->votesMenuStrip->Size = System::Drawing::Size(169, 48);
+			this->votesMenuStrip->Size = System::Drawing::Size(169, 70);
 			// 
 			// addToolStripMenuItem
 			// 
@@ -392,7 +459,6 @@ namespace lazyslash {
 			// 
 			// pasteToolStripMenuItem
 			// 
-			this->pasteToolStripMenuItem->Enabled = false;
 			this->pasteToolStripMenuItem->Name = L"pasteToolStripMenuItem";
 			this->pasteToolStripMenuItem->ShortcutKeys = static_cast<System::Windows::Forms::Keys>((System::Windows::Forms::Keys::Control | System::Windows::Forms::Keys::V));
 			this->pasteToolStripMenuItem->Size = System::Drawing::Size(168, 22);
@@ -485,20 +551,6 @@ namespace lazyslash {
 			this->aboutToolStripMenuItem->Size = System::Drawing::Size(48, 20);
 			this->aboutToolStripMenuItem->Text = L"&About";
 			this->aboutToolStripMenuItem->Click += gcnew System::EventHandler(this, &CompoWindow::aboutToolStripMenuItem_Click);
-			// 
-			// exportTxtLabel
-			// 
-			this->exportTxtLabel->AutoSize = true;
-			this->exportTxtLabel->Enabled = false;
-			this->exportTxtLabel->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 8.25F, System::Drawing::FontStyle::Underline, 
-				System::Drawing::GraphicsUnit::Point, static_cast<System::Byte>(0)));
-			this->exportTxtLabel->ForeColor = System::Drawing::Color::Blue;
-			this->exportTxtLabel->Location = System::Drawing::Point(168, 262);
-			this->exportTxtLabel->Name = L"exportTxtLabel";
-			this->exportTxtLabel->Size = System::Drawing::Size(114, 13);
-			this->exportTxtLabel->TabIndex = 10;
-			this->exportTxtLabel->Text = L"Open containing folder";
-			this->exportTxtLabel->Click += gcnew System::EventHandler(this, &CompoWindow::exportTxtLabel_Click);
 			// 
 			// CompoWindow
 			// 
@@ -824,7 +876,116 @@ namespace lazyslash {
 				return;
 			}
 
-			// TODO: accept pastes
+			/*
+			 * figure out votes on clipboard data
+			 */
+
+			array<String^>^ pastedata = ((String^)(System::Windows::Forms::Clipboard::GetData(System::Windows::Forms::DataFormats::Text)))->Replace(L"\r", L"")->Split(L'\n');
+			String^ voter = nullptr;
+			ArrayList^ votetokens = gcnew ArrayList;
+			
+			for each (String^ line in pastedata)
+			{
+	
+				System::Text::RegularExpressions::Regex re_nick(L"[^<]*<([^>]+)>");
+				System::Text::RegularExpressions::Match^ m_nick = re_nick.Match(line);
+				int start_votelook = 0;
+
+				if (m_nick->Success)
+				{
+					voter = m_nick->Groups[1]->Value;
+					start_votelook = m_nick->Index+m_nick->Length;
+				}
+				System::Text::RegularExpressions::Regex re_songs(L"[^a-zA-Z0-9_]+([a-zA-Z0-9_\.]+)", System::Text::RegularExpressions::RegexOptions::IgnoreCase);
+				System::Text::RegularExpressions::Match^ m_songs = re_songs.Match(line, start_votelook);
+				
+				while (m_songs->Success)
+				{
+					votetokens->Add(System::IO::Path::GetFileNameWithoutExtension(m_songs->Groups[1]->Value));
+					m_songs = m_songs->NextMatch();
+				}
+			}
+			if (votetokens->Count == 0)
+			{
+				return;
+			}
+
+			VoteData^ vd = gcnew VoteData;
+			
+			ArrayList^ songs = gcnew ArrayList;
+			ArrayList^ entrants = gcnew ArrayList;
+			get_current_songs_entrants(songs, entrants);
+
+			if (voter != nullptr)
+			{
+				vd->votingby = voter;
+
+				for each (System::Windows::Forms::ListViewItem^ lvi in this->entriesList->Items)
+				{
+					if (lvi == this->_empty_item)
+					{
+						continue;
+					}
+
+					CompoEntry^ ce = (CompoEntry^)(lvi->Tag);
+					
+					// !ce->voted is the same as checking if the song is in the vote list
+					// (or contained in the "entrants" list returned by get_current_song_entrants)
+					// ...
+					// but i don't trust it because it is intended for user-end
+					//if (!ce->voted && ce->composer == voter)
+					if (entrants->Contains(voter) && ce->composer == voter)
+					{
+						vd->votingfor = voter;
+						break;
+					}
+				}
+			}
+
+			for each (String^ vote in votetokens)
+			{
+				int lowestlscore = -1;
+				String ^result = nullptr;
+
+				for each (System::Windows::Forms::ListViewItem^ lvi in this->entriesList->Items)
+				{
+					if (lvi == this->_empty_item)
+					{
+						continue;
+					}
+
+					CompoEntry^ ce = (CompoEntry^)(lvi->Tag);
+
+					if (vd->votes->Contains(ce->filename))
+					{
+						// already-found results are not eligible to be found again!
+						continue;
+					}
+
+					int lscore = this->levenshtein(System::IO::Path::GetFileNameWithoutExtension(ce->filename), vote);
+					if (lscore < this->leven_threshold && (lowestlscore == -1 || lscore < lowestlscore))
+					{
+						lowestlscore = lscore;
+						result = ce->filename;
+					}
+				}
+
+				if (result != nullptr)
+				{
+					vd->votes->Add(result);
+				}
+				
+			}
+
+			this->add_voter(vd);
+
+			/*System::Windows::Forms::MessageBox::Show(
+				//L"...", // String::Join("\n", votetokens)
+				voter,
+				L"things",
+				System::Windows::Forms::MessageBoxButtons::OK);
+				*/
+			
 		}
 		
 		private: System::Void get_current_songs_entrants(ArrayList^ compoentries, ArrayList^ entrants)
@@ -858,9 +1019,9 @@ namespace lazyslash {
 			}
 		}
 
-		private: System::Void add_voter(void)
+		private: System::Void add_voter(VoteData^ vd)
 		{
-			VoteData^ vd = gcnew VoteData;
+			
 			ArrayList^ entrants = gcnew ArrayList;
 			ArrayList^ songs = gcnew ArrayList;
 
@@ -907,7 +1068,7 @@ namespace lazyslash {
 		}
 		private: System::Void addToolStripMenuItem_Click(System::Object^  sender, System::EventArgs^  e)
 		{
-			this->add_voter();
+			this->add_voter(gcnew VoteData);
 		}
 		
 		private: System::Void voteList_ColumnClick(System::Object^  sender, System::Windows::Forms::ColumnClickEventArgs^  e)
@@ -963,7 +1124,7 @@ namespace lazyslash {
 
 		private: System::Void voteList_DoubleClick(System::Object^  sender, System::EventArgs^  e)
 		{
-			this->add_voter();
+			this->add_voter(gcnew VoteData);
 		}
 		
 		private: String^ calc_results(void)

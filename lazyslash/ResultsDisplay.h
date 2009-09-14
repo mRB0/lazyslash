@@ -66,7 +66,7 @@ namespace lazyslash {
 			// closeButton
 			// 
 			this->closeButton->Anchor = static_cast<System::Windows::Forms::AnchorStyles>((System::Windows::Forms::AnchorStyles::Bottom | System::Windows::Forms::AnchorStyles::Right));
-			this->closeButton->Location = System::Drawing::Point(475, 293);
+			this->closeButton->Location = System::Drawing::Point(545, 293);
 			this->closeButton->Name = L"closeButton";
 			this->closeButton->Size = System::Drawing::Size(75, 23);
 			this->closeButton->TabIndex = 0;
@@ -87,14 +87,14 @@ namespace lazyslash {
 			this->resultsBox->Name = L"resultsBox";
 			this->resultsBox->ReadOnly = true;
 			this->resultsBox->ScrollBars = System::Windows::Forms::ScrollBars::Vertical;
-			this->resultsBox->Size = System::Drawing::Size(538, 275);
+			this->resultsBox->Size = System::Drawing::Size(608, 275);
 			this->resultsBox->TabIndex = 1;
 			// 
 			// ResultsDisplay
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
-			this->ClientSize = System::Drawing::Size(562, 328);
+			this->ClientSize = System::Drawing::Size(632, 328);
 			this->Controls->Add(this->resultsBox);
 			this->Controls->Add(this->closeButton);
 			this->Name = L"ResultsDisplay";
