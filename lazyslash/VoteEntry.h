@@ -322,7 +322,22 @@ namespace lazyslash {
 			}
 			else
 			{
-				this->okButton->Enabled = true;
+				if (this->voterCombo->SelectedIndex != 0)
+				{
+					CompoEntry ^ce = (CompoEntry^)(this->chosenBox->Items[this->chosenBox->Items->Count-1]->Tag);
+					if (ce->composer != (String^)(this->voterCombo->SelectedItem))
+					{
+						this->okButton->Enabled = false;
+					}
+					else
+					{
+						this->okButton->Enabled = true;
+					}
+				}
+				else
+				{
+					this->okButton->Enabled = true;
+				}
 			}
 		}
 

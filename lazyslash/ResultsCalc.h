@@ -38,8 +38,10 @@ private:
 	public ref class ResultsCalc :  public System::ComponentModel::Component
 	{
 	public:
-		ResultsCalc(ArrayList^ entries, ArrayList^ votes, String^ componame)
+		ResultsCalc(ArrayList^ entries, ArrayList^ votes, String^ componame, bool penalize)
 		{
+			this->penalize = penalize;
+
 			this->entries = entries;
 			this->votes = votes;
 			this->componame = componame;
@@ -69,6 +71,29 @@ private:
 						}
 					}
 					score--;
+				}
+			}
+
+			if (this->penalize)
+			{
+				
+				for each (CompoEntry^ ce in this->entries)
+				{
+					ce->voted = false;
+
+					for each (VoteData^ vd in this->votes)
+					{
+						if (vd->votingfor == ce->composer)
+						{
+							ce->voted = true;
+							break;
+						}
+					}
+
+					if (!ce->voted)
+					{
+						ce->score -= this->entries->Count;
+					}
 				}
 			}
 
@@ -131,6 +156,24 @@ private:
 					songname = ce->filename;
 				}
 
+				String^ scorestr;
+				if (this->penalize && !ce->voted)
+				{
+					int sc_penalty = this->entries->Count;
+					int sc_prepenalty = ce->score + sc_penalty;
+					
+					scorestr = ce->score.ToString() +
+						" (" +
+						sc_prepenalty.ToString() +
+						"-" +
+						sc_penalty.ToString() +
+						")";
+				}
+				else
+				{
+					scorestr = ce->score.ToString();
+				}
+
 				results += "[ PLACE " +
 					place.ToString() + 
 					" -=> " + 
@@ -138,7 +181,7 @@ private:
 					" <=- done by -=> " +
 					ce->composer +
 					" <=- with " +
-					ce->score.ToString() +
+					scorestr +
 					"pts ]\n";
 			}
 			results += "--\n";
@@ -203,6 +246,7 @@ private:
 
 		String^ results;
 		String^ componame;
+		bool penalize;
 
 
 	protected:

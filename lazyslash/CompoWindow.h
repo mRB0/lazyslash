@@ -111,7 +111,7 @@ namespace lazyslash {
 
 	protected:
 
-		static int leven_threshold = 3;
+		static int leven_threshold = 4;
 
 		String^ zipfilePath;
 		String^ txtfilePath;
@@ -127,6 +127,7 @@ namespace lazyslash {
 	private: System::Windows::Forms::ToolStripMenuItem^  addToolStripMenuItem;
 	private: System::Windows::Forms::ToolStripMenuItem^  aboutToolStripMenuItem;
 	private: System::Windows::Forms::Label^  exportTxtLabel;
+	private: System::Windows::Forms::ToolStripMenuItem^  addNewToolStripMenuItem;
 			 int sort_col;
 
 		/// <summary>
@@ -222,6 +223,7 @@ namespace lazyslash {
 			this->saveAsToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
 			this->exitToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
 			this->aboutToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
+			this->addNewToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
 			this->tabControl1->SuspendLayout();
 			this->entriesTab->SuspendLayout();
 			this->entriesMenuStrip->SuspendLayout();
@@ -328,18 +330,19 @@ namespace lazyslash {
 			// 
 			// entriesMenuStrip
 			// 
-			this->entriesMenuStrip->Items->AddRange(gcnew cli::array< System::Windows::Forms::ToolStripItem^  >(1) {this->removeToolStripMenuItem});
+			this->entriesMenuStrip->Items->AddRange(gcnew cli::array< System::Windows::Forms::ToolStripItem^  >(2) {this->removeToolStripMenuItem, 
+				this->addNewToolStripMenuItem});
 			this->entriesMenuStrip->Name = L"entriesMenuStrip";
 			this->entriesMenuStrip->RenderMode = System::Windows::Forms::ToolStripRenderMode::System;
-			this->entriesMenuStrip->Size = System::Drawing::Size(136, 26);
+			this->entriesMenuStrip->Size = System::Drawing::Size(169, 70);
 			this->entriesMenuStrip->Opening += gcnew System::ComponentModel::CancelEventHandler(this, &CompoWindow::entriesMenuStrip_Opening);
 			// 
 			// removeToolStripMenuItem
 			// 
 			this->removeToolStripMenuItem->Name = L"removeToolStripMenuItem";
 			this->removeToolStripMenuItem->ShortcutKeys = System::Windows::Forms::Keys::Delete;
-			this->removeToolStripMenuItem->Size = System::Drawing::Size(135, 22);
-			this->removeToolStripMenuItem->Text = L"Remove";
+			this->removeToolStripMenuItem->Size = System::Drawing::Size(168, 22);
+			this->removeToolStripMenuItem->Text = L"&Remove";
 			this->removeToolStripMenuItem->Click += gcnew System::EventHandler(this, &CompoWindow::removeToolStripMenuItem_Click);
 			// 
 			// txtCompoName1
@@ -447,7 +450,7 @@ namespace lazyslash {
 				this->pasteToolStripMenuItem});
 			this->votesMenuStrip->Name = L"votesMenuStrip";
 			this->votesMenuStrip->RenderMode = System::Windows::Forms::ToolStripRenderMode::System;
-			this->votesMenuStrip->Size = System::Drawing::Size(169, 70);
+			this->votesMenuStrip->Size = System::Drawing::Size(169, 48);
 			// 
 			// addToolStripMenuItem
 			// 
@@ -551,6 +554,14 @@ namespace lazyslash {
 			this->aboutToolStripMenuItem->Size = System::Drawing::Size(48, 20);
 			this->aboutToolStripMenuItem->Text = L"&About";
 			this->aboutToolStripMenuItem->Click += gcnew System::EventHandler(this, &CompoWindow::aboutToolStripMenuItem_Click);
+			// 
+			// addNewToolStripMenuItem
+			// 
+			this->addNewToolStripMenuItem->Name = L"addNewToolStripMenuItem";
+			this->addNewToolStripMenuItem->ShortcutKeys = static_cast<System::Windows::Forms::Keys>((System::Windows::Forms::Keys::Control | System::Windows::Forms::Keys::N));
+			this->addNewToolStripMenuItem->Size = System::Drawing::Size(168, 22);
+			this->addNewToolStripMenuItem->Text = L"Add &New...";
+			this->addNewToolStripMenuItem->Click += gcnew System::EventHandler(this, &CompoWindow::addNewToolStripMenuItem_Click);
 			// 
 			// CompoWindow
 			// 
@@ -797,12 +808,16 @@ namespace lazyslash {
 		{
 			for each (System::Windows::Forms::ListViewItem^ edititem in this->entriesList->SelectedItems)
 			{
+				ArrayList^ songs = gcnew ArrayList;
+				ArrayList^ entrants = gcnew ArrayList;
+				get_current_songs_entrants(songs, entrants);
+
 				if (edititem != this->_empty_item)
 				{
 					CompoEntry^ ce = (CompoEntry^)(edititem->Tag);
-
+					
 					// edit item
-					EntryEditor ee(ce);
+					EntryEditor ee(ce, songs);
 					ee.ShowDialog();
 
 					// make list entry match CompoEntry tag
@@ -813,7 +828,7 @@ namespace lazyslash {
 				{
 					CompoEntry ^ce = gcnew CompoEntry();
 
-					EntryEditor ee(ce);
+					EntryEditor ee(ce, songs);
 					if (ee.ShowDialog() == System::Windows::Forms::DialogResult::OK)
 					{
 						ListViewItem^ new_item = gcnew ListViewItem(gcnew array<String^>{L"",L"",L"",L""});
@@ -1127,7 +1142,7 @@ namespace lazyslash {
 			this->add_voter(gcnew VoteData);
 		}
 		
-		private: String^ calc_results(void)
+		private: String^ calc_results(bool penalize)
 		{
 			ArrayList ^entries = gcnew ArrayList;
 			ArrayList ^votes = gcnew ArrayList;
@@ -1145,7 +1160,7 @@ namespace lazyslash {
 			}
 
 
-			ResultsCalc rc(entries, votes, this->txtCompoName1->Text);
+			ResultsCalc rc(entries, votes, this->txtCompoName1->Text, penalize);
 
 			rc.calculate();
 			return rc.results;
@@ -1153,11 +1168,42 @@ namespace lazyslash {
 
 		private: System::Void viewButton_Click(System::Object^  sender, System::EventArgs^  e)
 		{
-			ResultsDisplay rd(calc_results());
+			System::Windows::Forms::DialogResult dr = this->check_results();
+
+			bool penalize;
+			if (dr == System::Windows::Forms::DialogResult::Cancel)
+			{
+				return;
+			}
+			else if (dr == System::Windows::Forms::DialogResult::Yes)
+			{
+				penalize = true;
+			}
+			else
+			{
+				penalize = false;
+			}
+			ResultsDisplay rd(calc_results(penalize));
 			rd.ShowDialog();
 		}
 		private: System::Void exportButton_Click(System::Object^  sender, System::EventArgs^  e)
 		{
+			System::Windows::Forms::DialogResult dr = this->check_results();
+
+			bool penalize;
+			if (dr == System::Windows::Forms::DialogResult::Cancel)
+			{
+				return;
+			}
+			else if (dr == System::Windows::Forms::DialogResult::Yes)
+			{
+				penalize = true;
+			}
+			else
+			{
+				penalize = false;
+			}
+
 			System::Windows::Forms::SaveFileDialog^ sfd = gcnew System::Windows::Forms::SaveFileDialog;
 			sfd->Filter = "txt files (*.txt)|*.txt|All files (*.*)|*.*";
 			sfd->FilterIndex = 0;
@@ -1168,7 +1214,7 @@ namespace lazyslash {
 			{
 				System::IO::StreamWriter^ outf = gcnew System::IO::StreamWriter(sfd->FileName);
 
-				outf->Write(calc_results());
+				outf->Write(calc_results(penalize));
 
 				outf->Close();
 
@@ -1202,6 +1248,67 @@ namespace lazyslash {
 			{
 				Process::Start("explorer.exe", "/e,/select,"+this->txtfilePath);
 			}
+		}
+		private: System::Void addNewToolStripMenuItem_Click(System::Object^  sender, System::EventArgs^  e)
+		{
+			if (this->tabControl1->SelectedTab == this->entriesTab)
+			{
+				ArrayList^ songs = gcnew ArrayList;
+				ArrayList^ entrants = gcnew ArrayList;
+				get_current_songs_entrants(songs, entrants);
+
+				CompoEntry ^ce = gcnew CompoEntry();
+
+				EntryEditor ee(ce, songs);
+				if (ee.ShowDialog() == System::Windows::Forms::DialogResult::OK)
+				{
+					ListViewItem^ new_item = gcnew ListViewItem(gcnew array<String^>{L"",L"",L"",L""});
+					new_item->Tag = ce;
+
+					this->entriesList->Items->Add(new_item);
+					this->match_entrylist_to_entry(new_item);
+				}
+
+			}
+		}
+		
+		private: System::Void get_current_votes(ArrayList^ votes)
+		{
+			for each (System::Windows::Forms::ColumnHeader^ ch in this->voteList->Columns)
+			{
+				votes->Add((VoteData^)(ch->Tag));
+			}
+		}
+		private: System::Windows::Forms::DialogResult check_results(void)
+		{
+			// check that all voters have submitted
+			ArrayList^ songs = gcnew ArrayList;
+			ArrayList^ entrants = gcnew ArrayList;
+
+			get_current_songs_entrants(songs, entrants);
+
+			if (entrants->Count > 0)
+			{
+				String^ slackers = L"";
+				for each (String^ slacker in entrants)
+				{
+					slackers += "\n" + slacker;
+				}
+				
+				System::Windows::Forms::DialogResult dr = System::Windows::Forms::MessageBox::Show(
+					L"The following people have not yet voted:\n" +
+					slackers +
+					"\n\nDo you want to penalize them?",
+					L"The Cockalizer",
+					System::Windows::Forms::MessageBoxButtons::YesNoCancel);
+
+				return dr;
+			}
+			else
+			{
+				return System::Windows::Forms::DialogResult::No;
+			}
+			
 		}
 };
 
