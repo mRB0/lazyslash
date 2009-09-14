@@ -316,33 +316,39 @@ namespace lazyslash {
 	
 		private: System::Void check_completed(void)
 		{
+			if (this->chosenBox->Items->Count == 0)
+			{
+				this->unVoteBtn->Enabled = false;
+				if (this->AcceptButton == this->unVoteBtn)
+				{
+					this->AcceptButton = this->okButton;
+				}
+			}
+			else
+			{
+				this->unVoteBtn->Enabled = true;
+			}
+
+			if (this->availBox->Items->Count == 0)
+			{
+				this->addVoteBtn->Enabled = false;
+				if (this->AcceptButton == this->addVoteBtn)
+				{
+					this->AcceptButton = this->okButton;
+				}
+			}
+			else
+			{
+				this->addVoteBtn->Enabled = true;
+			}
+
 			if ((this->voterText->Text == L"") || (this->availBox->Items->Count > 0))
 			{
 				this->okButton->Enabled = false;
 			}
 			else
 			{
-				if ((this->voterCombo->SelectedIndex != 0) &&
-					(this->chosenBox->Items->Count > 0))
-				{
-					// ensure that voter's own entry is last
-					
-					CompoEntry ^ce = (CompoEntry^)(this->chosenBox->Items[this->chosenBox->Items->Count-1]->Tag);
-					if (ce->composer != (String^)(this->voterCombo->SelectedItem))
-					{
-						this->okButton->Enabled = false;
-					}
-					else
-					{
-						this->okButton->Enabled = true;
-					}
-					
-				}
-
-				else
-				{
-					this->okButton->Enabled = true;
-				}
+				this->okButton->Enabled = true;
 			}
 		}
 
@@ -406,6 +412,37 @@ namespace lazyslash {
 		
 		private: System::Void okButton_Click(System::Object^  sender, System::EventArgs^  e)
 		{
+
+			// ensure that voter's own entry is last
+			if ((this->voterCombo->SelectedIndex != 0) &&
+				(this->chosenBox->Items->Count > 0))
+			{
+				CompoEntry ^ce = (CompoEntry^)(this->chosenBox->Items[this->chosenBox->Items->Count-1]->Tag);
+				if (ce->composer != (String^)(this->voterCombo->SelectedItem))
+				{
+					System::Windows::Forms::DialogResult dr;
+
+					for each (CompoEntry ^ce in this->compoentries)
+					{
+						if (ce->composer == (String^)(this->voterCombo->SelectedItem))
+						{
+							dr = System::Windows::Forms::MessageBox::Show(
+								ce->filename + L" was created by " + ce->composer +
+								L"\nand should be in last place.\n\n" +
+								L"Do you want to accept these votes anyway?",
+								L"EPECULIARORDERING",
+								System::Windows::Forms::MessageBoxButtons::YesNo);
+	
+							if (dr != System::Windows::Forms::DialogResult::Yes)
+							{
+								return;
+							}
+							break;
+						}
+					}
+				}
+			}
+
 			if (this->voterCombo->SelectedIndex == 0)
 			{
 				this->vd->votingfor = L"";
@@ -449,6 +486,7 @@ namespace lazyslash {
 		private: System::Void availBox_Enter(System::Object^  sender, System::EventArgs^  e)
 		{
 			this->AcceptButton = this->addVoteBtn;
+			check_completed();
 		}
 		private: System::Void availBox_Leave(System::Object^  sender, System::EventArgs^  e)
 		{
@@ -457,6 +495,7 @@ namespace lazyslash {
 		private: System::Void chosenBox_Enter(System::Object^  sender, System::EventArgs^  e)
 		{
 			this->AcceptButton = this->unVoteBtn;
+			this->check_completed();
 		}
 		private: System::Void chosenBox_Leave(System::Object^  sender, System::EventArgs^  e) 
 		{
