@@ -248,6 +248,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\compoversion.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\compoversion.h"
+				FileType="1"
+				>
+			</File>
+			<File
 				RelativePath=".\CompoWindow.h"
 				FileType="3"
 				>

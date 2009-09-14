@@ -8,6 +8,7 @@
 #include "VoteData.h"
 #include "ResultsCalc.h"
 #include "ResultsDisplay.h"
+#include "compoversion.h"
 
 namespace lazyslash {
 
@@ -69,6 +70,7 @@ namespace lazyslash {
 	private: System::Windows::Forms::ContextMenuStrip^  votesMenuStrip;
 	private: System::Windows::Forms::ToolStripMenuItem^  pasteToolStripMenuItem;
 	private: System::Windows::Forms::ToolStripMenuItem^  addToolStripMenuItem;
+	private: System::Windows::Forms::ToolStripMenuItem^  aboutToolStripMenuItem;
 			 int sort_col;
 
 		/// <summary>
@@ -162,6 +164,7 @@ namespace lazyslash {
 			this->saveToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
 			this->saveAsToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
 			this->exitToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
+			this->aboutToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
 			this->tabControl1->SuspendLayout();
 			this->entriesTab->SuspendLayout();
 			this->entriesMenuStrip->SuspendLayout();
@@ -219,7 +222,7 @@ namespace lazyslash {
 			this->createzipButton->Name = L"createzipButton";
 			this->createzipButton->Size = System::Drawing::Size(143, 23);
 			this->createzipButton->TabIndex = 4;
-			this->createzipButton->Text = L"Create votepack .ZIP";
+			this->createzipButton->Text = L"Create votepack .&ZIP";
 			this->createzipButton->UseVisualStyleBackColor = true;
 			this->createzipButton->Click += gcnew System::EventHandler(this, &CompoWindow::createzipButton_Click);
 			// 
@@ -346,7 +349,7 @@ namespace lazyslash {
 			this->viewButton->Name = L"viewButton";
 			this->viewButton->Size = System::Drawing::Size(75, 23);
 			this->viewButton->TabIndex = 8;
-			this->viewButton->Text = L"&View results";
+			this->viewButton->Text = L"View &results";
 			this->viewButton->UseVisualStyleBackColor = true;
 			this->viewButton->Click += gcnew System::EventHandler(this, &CompoWindow::viewButton_Click);
 			// 
@@ -372,7 +375,7 @@ namespace lazyslash {
 				this->pasteToolStripMenuItem});
 			this->votesMenuStrip->Name = L"votesMenuStrip";
 			this->votesMenuStrip->RenderMode = System::Windows::Forms::ToolStripRenderMode::System;
-			this->votesMenuStrip->Size = System::Drawing::Size(169, 48);
+			this->votesMenuStrip->Size = System::Drawing::Size(169, 70);
 			// 
 			// addToolStripMenuItem
 			// 
@@ -384,6 +387,7 @@ namespace lazyslash {
 			// 
 			// pasteToolStripMenuItem
 			// 
+			this->pasteToolStripMenuItem->Enabled = false;
 			this->pasteToolStripMenuItem->Name = L"pasteToolStripMenuItem";
 			this->pasteToolStripMenuItem->ShortcutKeys = static_cast<System::Windows::Forms::Keys>((System::Windows::Forms::Keys::Control | System::Windows::Forms::Keys::V));
 			this->pasteToolStripMenuItem->Size = System::Drawing::Size(168, 22);
@@ -396,7 +400,7 @@ namespace lazyslash {
 				| System::Windows::Forms::AnchorStyles::Right));
 			this->txtCompoName2->Location = System::Drawing::Point(188, 5);
 			this->txtCompoName2->Name = L"txtCompoName2";
-			this->txtCompoName2->Size = System::Drawing::Size(236, 20);
+			this->txtCompoName2->Size = System::Drawing::Size(234, 20);
 			this->txtCompoName2->TabIndex = 4;
 			this->txtCompoName2->TextChanged += gcnew System::EventHandler(this, &CompoWindow::txtCompoName2_TextChanged);
 			// 
@@ -424,7 +428,8 @@ namespace lazyslash {
 			// 
 			this->mainMenuStrip->BackColor = System::Drawing::SystemColors::ActiveBorder;
 			this->mainMenuStrip->ImageScalingSize = System::Drawing::Size(0, 0);
-			this->mainMenuStrip->Items->AddRange(gcnew cli::array< System::Windows::Forms::ToolStripItem^  >(1) {this->fileToolStripMenuItem});
+			this->mainMenuStrip->Items->AddRange(gcnew cli::array< System::Windows::Forms::ToolStripItem^  >(2) {this->fileToolStripMenuItem, 
+				this->aboutToolStripMenuItem});
 			this->mainMenuStrip->Location = System::Drawing::Point(0, 0);
 			this->mainMenuStrip->Name = L"mainMenuStrip";
 			this->mainMenuStrip->RenderMode = System::Windows::Forms::ToolStripRenderMode::System;
@@ -442,27 +447,39 @@ namespace lazyslash {
 			// 
 			// newToolStripMenuItem
 			// 
+			this->newToolStripMenuItem->Enabled = false;
 			this->newToolStripMenuItem->Name = L"newToolStripMenuItem";
-			this->newToolStripMenuItem->Size = System::Drawing::Size(125, 22);
+			this->newToolStripMenuItem->Size = System::Drawing::Size(132, 22);
 			this->newToolStripMenuItem->Text = L"&New";
 			// 
 			// saveToolStripMenuItem
 			// 
+			this->saveToolStripMenuItem->Enabled = false;
 			this->saveToolStripMenuItem->Name = L"saveToolStripMenuItem";
-			this->saveToolStripMenuItem->Size = System::Drawing::Size(125, 22);
+			this->saveToolStripMenuItem->Size = System::Drawing::Size(132, 22);
 			this->saveToolStripMenuItem->Text = L"&Save";
 			// 
 			// saveAsToolStripMenuItem
 			// 
+			this->saveAsToolStripMenuItem->Enabled = false;
 			this->saveAsToolStripMenuItem->Name = L"saveAsToolStripMenuItem";
-			this->saveAsToolStripMenuItem->Size = System::Drawing::Size(125, 22);
+			this->saveAsToolStripMenuItem->Size = System::Drawing::Size(132, 22);
 			this->saveAsToolStripMenuItem->Text = L"Save &As...";
 			// 
 			// exitToolStripMenuItem
 			// 
 			this->exitToolStripMenuItem->Name = L"exitToolStripMenuItem";
-			this->exitToolStripMenuItem->Size = System::Drawing::Size(125, 22);
+			this->exitToolStripMenuItem->ShortcutKeys = static_cast<System::Windows::Forms::Keys>((System::Windows::Forms::Keys::Alt | System::Windows::Forms::Keys::F4));
+			this->exitToolStripMenuItem->Size = System::Drawing::Size(132, 22);
 			this->exitToolStripMenuItem->Text = L"E&xit";
+			this->exitToolStripMenuItem->Click += gcnew System::EventHandler(this, &CompoWindow::exitToolStripMenuItem_Click);
+			// 
+			// aboutToolStripMenuItem
+			// 
+			this->aboutToolStripMenuItem->Name = L"aboutToolStripMenuItem";
+			this->aboutToolStripMenuItem->Size = System::Drawing::Size(48, 20);
+			this->aboutToolStripMenuItem->Text = L"&About";
+			this->aboutToolStripMenuItem->Click += gcnew System::EventHandler(this, &CompoWindow::aboutToolStripMenuItem_Click);
 			// 
 			// CompoWindow
 			// 
@@ -983,6 +1000,17 @@ namespace lazyslash {
 			{
 				Process::Start("explorer.exe", "/e,/select,"+this->zipfilePath);
 			}
+		}
+		private: System::Void exitToolStripMenuItem_Click(System::Object^  sender, System::EventArgs^  e)
+		{
+			this->Close();
+		}
+		private: System::Void aboutToolStripMenuItem_Click(System::Object^  sender, System::EventArgs^  e)
+		{
+			System::Windows::Forms::MessageBox::Show(
+				L"lazyslash compomagoo " + compoversion::version + "\ncompo management system\n\n(c) 2009 Mike Burke (mrb)\nmrburke@gmail.com",
+				L"Aboot",
+				System::Windows::Forms::MessageBoxButtons::OK);
 		}
 };
 
