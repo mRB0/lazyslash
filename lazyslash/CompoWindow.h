@@ -773,7 +773,7 @@ namespace lazyslash {
 			//sfd->RestoreDirectory = true;
 
 			DateTime^ now = DateTime::Now;
-			sfd->FileName = now->ToString("yyyy-MM-dd \"votepack.zip\"");
+			sfd->FileName = now->ToString("yyyy-MM-dd\"_votepack.zip\"");
 
 			if (sfd->ShowDialog() == System::Windows::Forms::DialogResult::OK)
 			{
@@ -1204,7 +1204,7 @@ namespace lazyslash {
 			sfd->Filter = "txt files (*.txt)|*.txt|All files (*.*)|*.*";
 			sfd->FilterIndex = 0;
 			DateTime^ now = DateTime::Now;
-			sfd->FileName = now->ToString("yyyy-MM-dd \"results.txt\"");
+			sfd->FileName = now->ToString("yyyy-MM-dd\"_results.txt\"");
 
 			if (sfd->ShowDialog() == System::Windows::Forms::DialogResult::OK)
 			{
