@@ -335,7 +335,7 @@ namespace lazyslash {
 			this->exportButton->Name = L"exportButton";
 			this->exportButton->Size = System::Drawing::Size(75, 23);
 			this->exportButton->TabIndex = 9;
-			this->exportButton->Text = L"Export TXT";
+			this->exportButton->Text = L"E&xport TXT";
 			this->exportButton->UseVisualStyleBackColor = true;
 			this->exportButton->Click += gcnew System::EventHandler(this, &CompoWindow::exportButton_Click);
 			// 
@@ -346,7 +346,7 @@ namespace lazyslash {
 			this->viewButton->Name = L"viewButton";
 			this->viewButton->Size = System::Drawing::Size(75, 23);
 			this->viewButton->TabIndex = 8;
-			this->viewButton->Text = L"View results";
+			this->viewButton->Text = L"&View results";
 			this->viewButton->UseVisualStyleBackColor = true;
 			this->viewButton->Click += gcnew System::EventHandler(this, &CompoWindow::viewButton_Click);
 			// 
@@ -742,6 +742,24 @@ namespace lazyslash {
 
 		private: System::Void tabControl1_Selecting(System::Object^  sender, System::Windows::Forms::TabControlCancelEventArgs^  e)
 		{
+			if (e->TabPage == this->tabPage2)
+			{
+				for each (System::Windows::Forms::ListViewItem^ lvi in this->entriesList->Items)
+				{
+					if (lvi != this->_empty_item)
+					{
+						if ( ((CompoEntry^)(lvi->Tag))->composer == L"" )
+						{
+							System::Windows::Forms::MessageBox::Show(
+								L"Fill in the Nick fields for\nentered songs before voting.",
+								L"The jig's up, Chuckles",
+								System::Windows::Forms::MessageBoxButtons::OK);
+							e->Cancel = true;
+							break;
+						}
+					}
+				}
+			}
 			if ((e->TabPage == entriesTab) && (this->voteList->Columns->Count > 0))
 			{
 				System::Windows::Forms::DialogResult dr;

@@ -74,8 +74,37 @@ private:
 			this->generate_results_string();
 		}
 
+		String^ generate_compo_name(void)
+		{
+			String^ name = L"";
+			Random rnd;
+			int structure = rnd.Next(0, 3);
+			
+			if (structure == 0 || structure == 2)
+			{
+				name += this->adjectives[rnd.Next(0, this->adjectives->Length)];
+			}
+			if (structure == 2)
+			{
+				name += L" ";
+			}
+			if (structure == 1 || structure == 2)
+			{
+				name += this->nouns[rnd.Next(0, this->nouns->Length)];
+			}
+
+			name += " Compo";
+
+			return name;
+		}
+
 		System::Void generate_results_string(void)
 		{
+			if (componame == L"")
+			{
+				componame = this->generate_compo_name();
+			}
+
 			results  = "** " + componame + " RESULTS!! **\n";
 			results += "--\n";
 
@@ -91,10 +120,20 @@ private:
 				}
 				lastscore = ce->score;
 
+				String^ songname;
+				if (ce->songtitle != L"")
+				{
+					songname = ce->songtitle + " (" + ce->filename + ")";
+				}
+				else
+				{
+					songname = ce->filename;
+				}
+
 				results += "[ PLACE " +
 					place.ToString() + 
 					" -=> " + 
-					ce->filename + 
+					songname + 
 					" <=- Done by -=> " +
 					ce->composer +
 					" <=- with " +
@@ -126,10 +165,29 @@ private:
 				for each (String^ vote in vd->votes)
 				{
 					i++;
+
+					String^ songname;
+
+					for each (CompoEntry ^ce in entries)
+					{
+						if (ce->filename == vote)
+						{
+							if (ce->songtitle != L"")
+							{
+								songname = ce->songtitle + " (" + ce->filename + ")";
+							}
+							else
+							{
+								songname = ce->filename;
+							}
+							break;
+						}
+					}
+
 					results += "[\\_Place -=> " +
 						i.ToString() +
 						" <=-=> " +
-						vote +
+						songname +
 						"_/]\n";
 				}
 			}
@@ -150,6 +208,50 @@ private:
 
 		ArrayList^ entries;
 		ArrayList^ votes;
+
+		static array<String^>^ adjectives = {
+			"Perilous",
+			"Mirthful",
+			"Wild", 
+			"Moist",
+			"Deadly",
+			"Strong",
+			"Spherical",
+			"Sucked",
+			"Space",
+			"Efficient",
+			"Oily",
+			"Sexist",
+			"Racist",
+			"Clockin'",
+			"Cockin'",
+			"Hot",
+			"Deven Gallo"
+		};
+		static array<String^>^ nouns = {
+			"Duck",
+			"Dingle",
+			"Bacon",
+			"Moon",
+			"Sphere",
+			"Spacepond",
+			"Pond",
+			"Wolf",
+			"Box",
+			"Water",
+			"Thrasher",
+			"Tiger",
+			"Squirrel",
+			"Squirrel King",
+			"Werehof",
+			"Clock",
+			"Cock",
+			"Bajs",
+			"Korv",
+			"Sausage",
+			"AINOR",
+			"Deven Gallo"
+		};
 
 		/// <summary>
 		/// Clean up any resources being used.
