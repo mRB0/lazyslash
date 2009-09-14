@@ -1,6 +1,7 @@
 #pragma once
 
 #include "VoteData.h"
+#include "CompoEntry.h"
 
 using namespace System;
 using namespace System::ComponentModel;
@@ -24,16 +25,20 @@ namespace lazyslash {
 	public ref class VoteEntry : public System::Windows::Forms::Form
 	{
 	public:
-		VoteEntry(VoteData^ vd, ArrayList^ entrants, ArrayList^ songs)
+		VoteEntry(VoteData^ vd, ArrayList^ entrants, ArrayList^ compoentries)
 		{
 			InitializeComponent();
-			
+
 			this->vd = vd;
 			this->entrants = entrants;
-			this->songs = songs;
+			
+			this->compoentries = compoentries;
 
 			this->AcceptButton = this->okButton;
 			this->CancelButton = this->canButton;
+
+			this->availBox->FullRowSelect = true;
+			this->chosenBox->FullRowSelect = true;
 			
 			this->voterCombo->DropDownStyle = System::Windows::Forms::ComboBoxStyle::DropDownList;
 			
@@ -54,16 +59,29 @@ namespace lazyslash {
 
 			this->voterText->Text = vd->votingby;
 
-			for each (String^ song in songs)
+			for each (CompoEntry^ ce in compoentries)
 			{
-				if (!vd->votes->Contains(song))
+				if (!vd->votes->Contains(ce->filename))
 				{
-					this->availBox->Items->Add(song);
+					System::Windows::Forms::ListViewItem^ nvi = gcnew System::Windows::Forms::ListViewItem(gcnew array<String^>{ce->filename,ce->songtitle});
+					nvi->Tag = ce;
+					this->availBox->Items->Add(nvi);
 				}
 			}
 			for each (String^ song in vd->votes)
 			{
-				this->chosenBox->Items->Add(song);
+				CompoEntry^ tce;
+				for each (CompoEntry^ ce in compoentries)
+				{
+					if (song == ce->filename)
+					{
+						tce = ce;
+						break;
+					}
+				}
+				System::Windows::Forms::ListViewItem^ nvi = gcnew System::Windows::Forms::ListViewItem(gcnew array<String^>{tce->filename,tce->songtitle});
+				nvi->Tag = tce;
+				this->chosenBox->Items->Add(nvi);
 			}
 				
 
@@ -74,9 +92,15 @@ namespace lazyslash {
 		
 		VoteData^ vd;
 		ArrayList^ entrants;
+		ArrayList^ compoentries;
+
 	private: System::Windows::Forms::Button^  unVoteBtn;
+	private: System::Windows::Forms::ColumnHeader^  columnHeader1;
+	private: System::Windows::Forms::ColumnHeader^  columnHeader2;
+	private: System::Windows::Forms::ColumnHeader^  columnHeader3;
+	private: System::Windows::Forms::ColumnHeader^  columnHeader4;
 	protected: 
-		ArrayList^ songs;
+		
 		
 
 		/// <summary>
@@ -93,10 +117,10 @@ namespace lazyslash {
 	private: System::Windows::Forms::ComboBox^  voterCombo;
 	private: System::Windows::Forms::Label^  label2;
 	private: System::Windows::Forms::TextBox^  voterText;
-	private: System::Windows::Forms::ListBox^  availBox;
+	private: System::Windows::Forms::ListView^  availBox;
 
 	private: System::Windows::Forms::Button^  addVoteBtn;
-	private: System::Windows::Forms::ListBox^  chosenBox;
+	private: System::Windows::Forms::ListView^  chosenBox;
 	private: System::Windows::Forms::Button^  okButton;
 	private: System::Windows::Forms::Button^  canButton;
 	protected: 
@@ -118,9 +142,13 @@ namespace lazyslash {
 			this->voterCombo = (gcnew System::Windows::Forms::ComboBox());
 			this->label2 = (gcnew System::Windows::Forms::Label());
 			this->voterText = (gcnew System::Windows::Forms::TextBox());
-			this->availBox = (gcnew System::Windows::Forms::ListBox());
+			this->availBox = (gcnew System::Windows::Forms::ListView());
+			this->columnHeader1 = (gcnew System::Windows::Forms::ColumnHeader());
+			this->columnHeader2 = (gcnew System::Windows::Forms::ColumnHeader());
 			this->addVoteBtn = (gcnew System::Windows::Forms::Button());
-			this->chosenBox = (gcnew System::Windows::Forms::ListBox());
+			this->chosenBox = (gcnew System::Windows::Forms::ListView());
+			this->columnHeader3 = (gcnew System::Windows::Forms::ColumnHeader());
+			this->columnHeader4 = (gcnew System::Windows::Forms::ColumnHeader());
 			this->okButton = (gcnew System::Windows::Forms::Button());
 			this->canButton = (gcnew System::Windows::Forms::Button());
 			this->unVoteBtn = (gcnew System::Windows::Forms::Button());
@@ -167,24 +195,39 @@ namespace lazyslash {
 			// 
 			// availBox
 			// 
-			this->availBox->Anchor = static_cast<System::Windows::Forms::AnchorStyles>(((System::Windows::Forms::AnchorStyles::Top | System::Windows::Forms::AnchorStyles::Bottom) 
-				| System::Windows::Forms::AnchorStyles::Left));
-			this->availBox->FormattingEnabled = true;
+			this->availBox->Anchor = static_cast<System::Windows::Forms::AnchorStyles>((((System::Windows::Forms::AnchorStyles::Top | System::Windows::Forms::AnchorStyles::Bottom) 
+				| System::Windows::Forms::AnchorStyles::Left) 
+				| System::Windows::Forms::AnchorStyles::Right));
+			this->availBox->Columns->AddRange(gcnew cli::array< System::Windows::Forms::ColumnHeader^  >(2) {this->columnHeader1, this->columnHeader2});
+			this->availBox->HeaderStyle = System::Windows::Forms::ColumnHeaderStyle::Nonclickable;
 			this->availBox->Location = System::Drawing::Point(12, 33);
+			this->availBox->MultiSelect = false;
 			this->availBox->Name = L"availBox";
 			this->availBox->Size = System::Drawing::Size(162, 173);
 			this->availBox->TabIndex = 4;
+			this->availBox->UseCompatibleStateImageBehavior = false;
+			this->availBox->View = System::Windows::Forms::View::Details;
+			this->availBox->DoubleClick += gcnew System::EventHandler(this, &VoteEntry::availBox_DoubleClick);
 			this->availBox->Leave += gcnew System::EventHandler(this, &VoteEntry::availBox_Leave);
 			this->availBox->Enter += gcnew System::EventHandler(this, &VoteEntry::availBox_Enter);
-			this->availBox->DoubleClick += gcnew System::EventHandler(this, &VoteEntry::availBox_DoubleClick);
+			// 
+			// columnHeader1
+			// 
+			this->columnHeader1->Text = L"Filename";
+			this->columnHeader1->Width = 73;
+			// 
+			// columnHeader2
+			// 
+			this->columnHeader2->Text = L"Title";
+			this->columnHeader2->Width = 84;
 			// 
 			// addVoteBtn
 			// 
-			this->addVoteBtn->Anchor = System::Windows::Forms::AnchorStyles::None;
+			this->addVoteBtn->Anchor = System::Windows::Forms::AnchorStyles::Right;
 			this->addVoteBtn->Location = System::Drawing::Point(180, 74);
 			this->addVoteBtn->Name = L"addVoteBtn";
 			this->addVoteBtn->Size = System::Drawing::Size(41, 41);
-			this->addVoteBtn->TabIndex = 5;
+			this->addVoteBtn->TabIndex = 8;
 			this->addVoteBtn->Text = L"=>";
 			this->addVoteBtn->UseVisualStyleBackColor = true;
 			this->addVoteBtn->Click += gcnew System::EventHandler(this, &VoteEntry::addVoteBtn_Click);
@@ -193,14 +236,28 @@ namespace lazyslash {
 			// 
 			this->chosenBox->Anchor = static_cast<System::Windows::Forms::AnchorStyles>(((System::Windows::Forms::AnchorStyles::Top | System::Windows::Forms::AnchorStyles::Bottom) 
 				| System::Windows::Forms::AnchorStyles::Right));
-			this->chosenBox->FormattingEnabled = true;
+			this->chosenBox->Columns->AddRange(gcnew cli::array< System::Windows::Forms::ColumnHeader^  >(2) {this->columnHeader3, this->columnHeader4});
+			this->chosenBox->HeaderStyle = System::Windows::Forms::ColumnHeaderStyle::Nonclickable;
 			this->chosenBox->Location = System::Drawing::Point(227, 33);
+			this->chosenBox->MultiSelect = false;
 			this->chosenBox->Name = L"chosenBox";
 			this->chosenBox->Size = System::Drawing::Size(157, 173);
-			this->chosenBox->TabIndex = 6;
+			this->chosenBox->TabIndex = 5;
+			this->chosenBox->UseCompatibleStateImageBehavior = false;
+			this->chosenBox->View = System::Windows::Forms::View::Details;
+			this->chosenBox->DoubleClick += gcnew System::EventHandler(this, &VoteEntry::chosenBox_DoubleClick);
 			this->chosenBox->Leave += gcnew System::EventHandler(this, &VoteEntry::chosenBox_Leave);
 			this->chosenBox->Enter += gcnew System::EventHandler(this, &VoteEntry::chosenBox_Enter);
-			this->chosenBox->DoubleClick += gcnew System::EventHandler(this, &VoteEntry::chosenBox_DoubleClick);
+			// 
+			// columnHeader3
+			// 
+			this->columnHeader3->Text = L"Filename";
+			this->columnHeader3->Width = 71;
+			// 
+			// columnHeader4
+			// 
+			this->columnHeader4->Text = L"Title";
+			this->columnHeader4->Width = 79;
 			// 
 			// okButton
 			// 
@@ -208,7 +265,7 @@ namespace lazyslash {
 			this->okButton->Location = System::Drawing::Point(228, 212);
 			this->okButton->Name = L"okButton";
 			this->okButton->Size = System::Drawing::Size(75, 23);
-			this->okButton->TabIndex = 7;
+			this->okButton->TabIndex = 6;
 			this->okButton->Text = L"OK";
 			this->okButton->UseVisualStyleBackColor = true;
 			this->okButton->Click += gcnew System::EventHandler(this, &VoteEntry::okButton_Click);
@@ -219,13 +276,13 @@ namespace lazyslash {
 			this->canButton->Location = System::Drawing::Point(309, 212);
 			this->canButton->Name = L"canButton";
 			this->canButton->Size = System::Drawing::Size(75, 23);
-			this->canButton->TabIndex = 8;
+			this->canButton->TabIndex = 7;
 			this->canButton->Text = L"Cancel";
 			this->canButton->UseVisualStyleBackColor = true;
 			// 
 			// unVoteBtn
 			// 
-			this->unVoteBtn->Anchor = System::Windows::Forms::AnchorStyles::None;
+			this->unVoteBtn->Anchor = System::Windows::Forms::AnchorStyles::Right;
 			this->unVoteBtn->Location = System::Drawing::Point(180, 121);
 			this->unVoteBtn->Name = L"unVoteBtn";
 			this->unVoteBtn->Size = System::Drawing::Size(41, 41);
@@ -290,14 +347,14 @@ namespace lazyslash {
 		{
 			ArrayList al;
 
-			for each (String^ moving in this->chosenBox->SelectedItems)
+			for each (System::Windows::Forms::ListViewItem^ moving in this->chosenBox->SelectedItems)
 			{
-				this->availBox->Items->Add(moving);
 				al.Add(moving);
 			}
-			for each (String^ removing in al)
+			for each (System::Windows::Forms::ListViewItem^ removing in al)
 			{
 				this->chosenBox->Items->Remove(removing);
+				this->availBox->Items->Add(removing);
 			}
 
 			check_completed();
@@ -306,14 +363,14 @@ namespace lazyslash {
 		{
 			ArrayList al;
 
-			for each (String^ moving in this->availBox->SelectedItems)
+			for each (System::Windows::Forms::ListViewItem^ moving in this->availBox->SelectedItems)
 			{
-				this->chosenBox->Items->Add(moving);
 				al.Add(moving);
 			}
-			for each (String^ removing in al)
+			for each (System::Windows::Forms::ListViewItem^ removing in al)
 			{
 				this->availBox->Items->Remove(removing);
+				this->chosenBox->Items->Add(removing);
 			}
 
 			check_completed();
@@ -338,12 +395,24 @@ namespace lazyslash {
 				this->vd->votingfor = (String^)(this->voterCombo->SelectedItem);
 			}
 
+			if (this->vd->votingfor != L"")
+			{
+				for each (CompoEntry^ ce in this->compoentries)
+				{
+					if (ce->composer == this->vd->votingfor)
+					{
+						ce->voted = true;
+						break;
+					}
+				}
+			}
+
 			this->vd->votingby = this->voterText->Text;
 
 			this->vd->votes = gcnew ArrayList;
-			for each (String^ songname in this->chosenBox->Items)
+			for each (System::Windows::Forms::ListViewItem^ lvi in this->chosenBox->Items)
 			{
-				this->vd->votes->Add(songname);
+				this->vd->votes->Add(((CompoEntry^)(lvi->Tag))->filename);
 			}
 
 			this->DialogResult = System::Windows::Forms::DialogResult::OK;

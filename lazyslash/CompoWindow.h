@@ -38,6 +38,7 @@ namespace lazyslash {
 			zipfilePath = nullptr;
 
 			this->entriesList->FullRowSelect = true;
+			this->voteList->FullRowSelect = true;
 			
 			_empty_item = gcnew System::Windows::Forms::ListViewItem(gcnew array<String^>{L"", L"", L"(add new)", L""});
 
@@ -681,6 +682,7 @@ namespace lazyslash {
 
 			if (sfd->ShowDialog() == System::Windows::Forms::DialogResult::OK)
 			{
+				
 				Ionic::Zip::ZipFile^ zf = gcnew Ionic::Zip::ZipFile;
 	
 				
@@ -771,7 +773,7 @@ namespace lazyslash {
 			// TODO: accept pastes
 		}
 		
-		private: System::Void get_current_songs_entrants(ArrayList^ songs, ArrayList^ entrants)
+		private: System::Void get_current_songs_entrants(ArrayList^ compoentries, ArrayList^ entrants)
 		{
 
 			ArrayList^ already_used_names = gcnew ArrayList;
@@ -792,7 +794,7 @@ namespace lazyslash {
 				if (lvi != this->_empty_item)
 				{
 					CompoEntry ^ce = (CompoEntry^)(lvi->Tag);
-					songs->Add(ce->filename);
+					compoentries->Add(ce);
 					
 					if (!already_used_names->Contains(ce->composer))
 					{
