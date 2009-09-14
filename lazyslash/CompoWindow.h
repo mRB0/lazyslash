@@ -6,6 +6,8 @@
 #include "EntryEditor.h"
 #include "VoteEntry.h"
 #include "VoteData.h"
+#include "ResultsCalc.h"
+#include "ResultsDisplay.h"
 
 namespace lazyslash {
 
@@ -328,6 +330,7 @@ namespace lazyslash {
 			this->exportButton->TabIndex = 9;
 			this->exportButton->Text = L"Export TXT";
 			this->exportButton->UseVisualStyleBackColor = true;
+			this->exportButton->Click += gcnew System::EventHandler(this, &CompoWindow::exportButton_Click);
 			// 
 			// viewButton
 			// 
@@ -338,6 +341,7 @@ namespace lazyslash {
 			this->viewButton->TabIndex = 8;
 			this->viewButton->Text = L"View results";
 			this->viewButton->UseVisualStyleBackColor = true;
+			this->viewButton->Click += gcnew System::EventHandler(this, &CompoWindow::viewButton_Click);
 			// 
 			// voteList
 			// 
@@ -462,7 +466,7 @@ namespace lazyslash {
 			this->Controls->Add(this->mainMenuStrip);
 			this->MainMenuStrip = this->mainMenuStrip;
 			this->Name = L"CompoWindow";
-			this->Text = L"CompoWindow";
+			this->Text = L"lazyslash compomagoo";
 			this->Load += gcnew System::EventHandler(this, &CompoWindow::CompoWindow_Load);
 			this->tabControl1->ResumeLayout(false);
 			this->entriesTab->ResumeLayout(false);
@@ -574,14 +578,6 @@ namespace lazyslash {
 			this->entriesList->Sort();
 			this->check_zip_button();
 
-		}
-
-		private: System::Void addVoterButton_Click(System::Object^  sender, System::EventArgs^  e)
-		{
-		}
-
-		private: System::Void pasteButton_Click(System::Object^  sender, System::EventArgs^  e)
-		{
 		}
 
 		private: System::Void txtCompoName2_TextChanged(System::Object^  sender, System::EventArgs^  e)
@@ -881,6 +877,40 @@ namespace lazyslash {
 		private: System::Void voteList_DoubleClick(System::Object^  sender, System::EventArgs^  e)
 		{
 			this->add_voter();
+		}
+		
+		private: String^ calc_results(void)
+		{
+			ArrayList ^entries = gcnew ArrayList;
+			ArrayList ^votes = gcnew ArrayList;
+
+			for each (System::Windows::Forms::ListViewItem^ lvi in this->entriesList->Items)
+			{
+				if (lvi != this->_empty_item)
+				{
+					entries->Add((CompoEntry^)(lvi->Tag));
+				}
+			}
+			for each (System::Windows::Forms::ColumnHeader^ ch in this->voteList->Columns)
+			{
+				votes->Add((VoteData^)(ch->Tag));
+			}
+
+
+			ResultsCalc rc(entries, votes, this->txtCompoName1->Text);
+
+			rc.calculate();
+			return rc.results;
+		}
+
+		private: System::Void viewButton_Click(System::Object^  sender, System::EventArgs^  e)
+		{
+			ResultsDisplay rd(calc_results());
+			rd.ShowDialog();
+		}
+		private: System::Void exportButton_Click(System::Object^  sender, System::EventArgs^  e)
+		{
+
 		}
 };
 

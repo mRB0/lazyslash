@@ -56,14 +56,14 @@ namespace lazyslash {
 
 			for each (String^ song in songs)
 			{
-				if (vd->votes->Contains(song))
-				{
-					this->chosenBox->Items->Add(song);
-				}
-				else
+				if (!vd->votes->Contains(song))
 				{
 					this->availBox->Items->Add(song);
 				}
+			}
+			for each (String^ song in vd->votes)
+			{
+				this->chosenBox->Items->Add(song);
 			}
 				
 

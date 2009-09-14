@@ -21,6 +21,7 @@ namespace lazyslash {
 			this->songtitle = L"";
 			this->composer = L"";
 			this->voted = false;
+			score = 0;
 		}
 		CompoEntry(String^ filespec, String^ songtitle)
 		{
@@ -29,12 +30,14 @@ namespace lazyslash {
 			this->songtitle = songtitle;
 			this->composer = L"";
 			this->voted = false;
+			score = 0;
 		}
 
 		String^ filespec;
 		String^ filename;
 		String^ songtitle;
 		String^ composer;
+		int score;
 		bool voted;
 
 	protected:
