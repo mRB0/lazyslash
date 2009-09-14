@@ -36,22 +36,8 @@ namespace lazyslash {
 		{
 			InitializeComponent();
 
-			zipfilePath = nullptr;
-			txtfilePath = nullptr;
+			this->open_new();
 
-			this->entriesList->FullRowSelect = true;
-			this->voteList->FullRowSelect = true;
-			
-			_empty_item = gcnew System::Windows::Forms::ListViewItem(gcnew array<String^>{L"", L"", L"(add new)", L""});
-
-			this->entriesList->Items->Add(_empty_item);
-
-			sort_ascending = true;
-			sort_col = 2;
-
-			this->entriesList->ListViewItemSorter = gcnew ListViewItemComparer(sort_col, sort_ascending, this->_empty_item);
-
-			this->check_zip_button();
 
 		}
 
@@ -115,6 +101,7 @@ namespace lazyslash {
 
 		String^ zipfilePath;
 		String^ txtfilePath;
+		String^ savefilePath;
 
 		System::Windows::Forms::ListViewItem^ _empty_item;
 		bool sort_ascending;
@@ -128,6 +115,7 @@ namespace lazyslash {
 	private: System::Windows::Forms::ToolStripMenuItem^  aboutToolStripMenuItem;
 	private: System::Windows::Forms::Label^  exportTxtLabel;
 	private: System::Windows::Forms::ToolStripMenuItem^  addNewToolStripMenuItem;
+	private: System::Windows::Forms::ToolStripMenuItem^  openToolStripMenuItem;
 			 int sort_col;
 
 		/// <summary>
@@ -202,6 +190,7 @@ namespace lazyslash {
 			this->columnHeader3 = (gcnew System::Windows::Forms::ColumnHeader());
 			this->entriesMenuStrip = (gcnew System::Windows::Forms::ContextMenuStrip(this->components));
 			this->removeToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
+			this->addNewToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
 			this->txtCompoName1 = (gcnew System::Windows::Forms::TextBox());
 			this->label1 = (gcnew System::Windows::Forms::Label());
 			this->entriesLabel = (gcnew System::Windows::Forms::Label());
@@ -219,11 +208,11 @@ namespace lazyslash {
 			this->mainMenuStrip = (gcnew System::Windows::Forms::MenuStrip());
 			this->fileToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
 			this->newToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
+			this->openToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
 			this->saveToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
 			this->saveAsToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
 			this->exitToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
 			this->aboutToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
-			this->addNewToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
 			this->tabControl1->SuspendLayout();
 			this->entriesTab->SuspendLayout();
 			this->entriesMenuStrip->SuspendLayout();
@@ -334,7 +323,7 @@ namespace lazyslash {
 				this->addNewToolStripMenuItem});
 			this->entriesMenuStrip->Name = L"entriesMenuStrip";
 			this->entriesMenuStrip->RenderMode = System::Windows::Forms::ToolStripRenderMode::System;
-			this->entriesMenuStrip->Size = System::Drawing::Size(169, 70);
+			this->entriesMenuStrip->Size = System::Drawing::Size(169, 48);
 			this->entriesMenuStrip->Opening += gcnew System::ComponentModel::CancelEventHandler(this, &CompoWindow::entriesMenuStrip_Opening);
 			// 
 			// removeToolStripMenuItem
@@ -344,6 +333,14 @@ namespace lazyslash {
 			this->removeToolStripMenuItem->Size = System::Drawing::Size(168, 22);
 			this->removeToolStripMenuItem->Text = L"&Remove";
 			this->removeToolStripMenuItem->Click += gcnew System::EventHandler(this, &CompoWindow::removeToolStripMenuItem_Click);
+			// 
+			// addNewToolStripMenuItem
+			// 
+			this->addNewToolStripMenuItem->Name = L"addNewToolStripMenuItem";
+			this->addNewToolStripMenuItem->ShortcutKeys = static_cast<System::Windows::Forms::Keys>((System::Windows::Forms::Keys::Control | System::Windows::Forms::Keys::N));
+			this->addNewToolStripMenuItem->Size = System::Drawing::Size(168, 22);
+			this->addNewToolStripMenuItem->Text = L"Add &New...";
+			this->addNewToolStripMenuItem->Click += gcnew System::EventHandler(this, &CompoWindow::addNewToolStripMenuItem_Click);
 			// 
 			// txtCompoName1
 			// 
@@ -513,38 +510,45 @@ namespace lazyslash {
 			// 
 			// fileToolStripMenuItem
 			// 
-			this->fileToolStripMenuItem->DropDownItems->AddRange(gcnew cli::array< System::Windows::Forms::ToolStripItem^  >(4) {this->newToolStripMenuItem, 
-				this->saveToolStripMenuItem, this->saveAsToolStripMenuItem, this->exitToolStripMenuItem});
+			this->fileToolStripMenuItem->DropDownItems->AddRange(gcnew cli::array< System::Windows::Forms::ToolStripItem^  >(5) {this->newToolStripMenuItem, 
+				this->openToolStripMenuItem, this->saveToolStripMenuItem, this->saveAsToolStripMenuItem, this->exitToolStripMenuItem});
 			this->fileToolStripMenuItem->Name = L"fileToolStripMenuItem";
 			this->fileToolStripMenuItem->Size = System::Drawing::Size(35, 20);
 			this->fileToolStripMenuItem->Text = L"&File";
 			// 
 			// newToolStripMenuItem
 			// 
-			this->newToolStripMenuItem->Enabled = false;
 			this->newToolStripMenuItem->Name = L"newToolStripMenuItem";
-			this->newToolStripMenuItem->Size = System::Drawing::Size(132, 22);
+			this->newToolStripMenuItem->Size = System::Drawing::Size(152, 22);
 			this->newToolStripMenuItem->Text = L"&New";
+			this->newToolStripMenuItem->Click += gcnew System::EventHandler(this, &CompoWindow::newToolStripMenuItem_Click);
+			// 
+			// openToolStripMenuItem
+			// 
+			this->openToolStripMenuItem->Name = L"openToolStripMenuItem";
+			this->openToolStripMenuItem->Size = System::Drawing::Size(152, 22);
+			this->openToolStripMenuItem->Text = L"Open";
+			this->openToolStripMenuItem->Click += gcnew System::EventHandler(this, &CompoWindow::openToolStripMenuItem_Click);
 			// 
 			// saveToolStripMenuItem
 			// 
-			this->saveToolStripMenuItem->Enabled = false;
 			this->saveToolStripMenuItem->Name = L"saveToolStripMenuItem";
-			this->saveToolStripMenuItem->Size = System::Drawing::Size(132, 22);
+			this->saveToolStripMenuItem->Size = System::Drawing::Size(152, 22);
 			this->saveToolStripMenuItem->Text = L"&Save";
+			this->saveToolStripMenuItem->Click += gcnew System::EventHandler(this, &CompoWindow::saveToolStripMenuItem_Click);
 			// 
 			// saveAsToolStripMenuItem
 			// 
-			this->saveAsToolStripMenuItem->Enabled = false;
 			this->saveAsToolStripMenuItem->Name = L"saveAsToolStripMenuItem";
-			this->saveAsToolStripMenuItem->Size = System::Drawing::Size(132, 22);
+			this->saveAsToolStripMenuItem->Size = System::Drawing::Size(152, 22);
 			this->saveAsToolStripMenuItem->Text = L"Save &As...";
+			this->saveAsToolStripMenuItem->Click += gcnew System::EventHandler(this, &CompoWindow::saveAsToolStripMenuItem_Click);
 			// 
 			// exitToolStripMenuItem
 			// 
 			this->exitToolStripMenuItem->Name = L"exitToolStripMenuItem";
 			this->exitToolStripMenuItem->ShortcutKeys = static_cast<System::Windows::Forms::Keys>((System::Windows::Forms::Keys::Alt | System::Windows::Forms::Keys::F4));
-			this->exitToolStripMenuItem->Size = System::Drawing::Size(132, 22);
+			this->exitToolStripMenuItem->Size = System::Drawing::Size(152, 22);
 			this->exitToolStripMenuItem->Text = L"E&xit";
 			this->exitToolStripMenuItem->Click += gcnew System::EventHandler(this, &CompoWindow::exitToolStripMenuItem_Click);
 			// 
@@ -554,14 +558,6 @@ namespace lazyslash {
 			this->aboutToolStripMenuItem->Size = System::Drawing::Size(48, 20);
 			this->aboutToolStripMenuItem->Text = L"&About";
 			this->aboutToolStripMenuItem->Click += gcnew System::EventHandler(this, &CompoWindow::aboutToolStripMenuItem_Click);
-			// 
-			// addNewToolStripMenuItem
-			// 
-			this->addNewToolStripMenuItem->Name = L"addNewToolStripMenuItem";
-			this->addNewToolStripMenuItem->ShortcutKeys = static_cast<System::Windows::Forms::Keys>((System::Windows::Forms::Keys::Control | System::Windows::Forms::Keys::N));
-			this->addNewToolStripMenuItem->Size = System::Drawing::Size(168, 22);
-			this->addNewToolStripMenuItem->Text = L"Add &New...";
-			this->addNewToolStripMenuItem->Click += gcnew System::EventHandler(this, &CompoWindow::addNewToolStripMenuItem_Click);
 			// 
 			// CompoWindow
 			// 
@@ -592,7 +588,7 @@ namespace lazyslash {
 		private: System::Void match_entrylist_to_entry(System::Windows::Forms::ListViewItem^ edititem)
 		{
 			CompoEntry^ ce = (CompoEntry^)(edititem->Tag);
-			edititem->SubItems[0]->Text = (ce->voted ? L"yes" : L"NO");
+			edititem->SubItems[0]->Text = "";
 			edititem->SubItems[1]->Text = ce->composer;
 			edititem->SubItems[2]->Text = ce->filename;
 			edititem->SubItems[3]->Text = ce->songtitle;
@@ -1309,6 +1305,297 @@ namespace lazyslash {
 				return System::Windows::Forms::DialogResult::No;
 			}
 			
+		}
+		
+		private: System::Void open_new(void)
+		{
+			zipfilePath = nullptr;
+			txtfilePath = nullptr;
+			savefilePath = nullptr;
+
+			this->entriesList->Items->Clear();
+			this->voteList->Clear();
+
+			this->tabControl1->SelectedTab = this->entriesTab;
+
+			this->entriesList->FullRowSelect = true;
+			this->voteList->FullRowSelect = true;
+			
+			_empty_item = gcnew System::Windows::Forms::ListViewItem(gcnew array<String^>{L"", L"", L"(add new)", L""});
+
+			this->entriesList->Items->Add(_empty_item);
+
+			sort_ascending = true;
+			sort_col = 2;
+
+			this->entriesList->ListViewItemSorter = gcnew ListViewItemComparer(sort_col, sort_ascending, this->_empty_item);
+
+			this->check_zip_button();
+		}
+
+		private: bool save(bool save_as)
+		{
+			String^ savefile = nullptr;
+
+			if (save_as || this->savefilePath == nullptr)
+			{
+				System::Windows::Forms::SaveFileDialog^ sfd = gcnew System::Windows::Forms::SaveFileDialog;
+				sfd->Filter = "compo files (*.compo)|*.compo|All files (*.*)|*.*";
+				sfd->FilterIndex = 0;
+				if (this->savefilePath != nullptr)
+				{
+					sfd->FileName = this->savefilePath;
+				}
+				if (sfd->ShowDialog() == System::Windows::Forms::DialogResult::OK)
+				{
+					savefile = sfd->FileName;
+				}
+			}
+			else
+			{
+				savefile = this->savefilePath;
+			}
+
+			if (savefile != nullptr)
+			{
+				try
+				{
+					ArrayList^ songs = gcnew ArrayList;
+					ArrayList^ entrants = gcnew ArrayList;
+					ArrayList^ votes = gcnew ArrayList;
+					this->get_current_songs_entrants(songs, entrants);
+					this->get_current_votes(votes);
+					
+					System::IO::StreamWriter^ outf = gcnew System::IO::StreamWriter(savefile);
+
+					// write songs/entries
+					outf->WriteLine(songs->Count.ToString());
+					for each (CompoEntry^ ce in songs)
+					{
+						outf->WriteLine(ce->composer);
+						outf->WriteLine(ce->filename);
+						outf->WriteLine(ce->songtitle);
+					}
+					
+					// write votes
+					outf->WriteLine(votes->Count.ToString());
+					for each (VoteData^ vd in votes)
+					{
+						outf->WriteLine(vd->votingfor);
+						outf->WriteLine(vd->votingby);
+						outf->WriteLine(vd->votes->Count.ToString());
+						for each (String^ vote in vd->votes)
+						{
+							outf->WriteLine(vote);
+						}
+					}
+
+					outf->Close();
+					
+					this->savefilePath = savefile;
+					
+					return true;
+				}
+				catch(...)
+				{
+					System::Windows::Forms::MessageBox::Show(
+						L"Some error occurred while saving.\nYour data probably wasn't saved.",
+						L"Bzzt",
+						System::Windows::Forms::MessageBoxButtons::OK);
+					return false;
+				}
+			}
+			else
+			{
+				return false;
+			}
+		}
+
+		private: bool open_file(void)
+		{
+			String^ openfile = nullptr;
+
+			System::Windows::Forms::OpenFileDialog^ ofd = gcnew System::Windows::Forms::OpenFileDialog;
+			ofd->Filter = "compo files (*.compo)|*.compo|All files (*.*)|*.*";
+			ofd->FilterIndex = 0;
+			if (this->savefilePath != nullptr)
+			{
+				ofd->FileName = this->savefilePath;
+			}
+			if (ofd->ShowDialog() == System::Windows::Forms::DialogResult::OK)
+			{
+				try
+				{
+					ArrayList^ songs = gcnew ArrayList;
+					ArrayList^ votes = gcnew ArrayList;
+					
+					System::IO::StreamReader^ inf = gcnew System::IO::StreamReader(ofd->FileName);
+					String^ line = L"lol";
+
+					// load songs/entries
+					line = inf->ReadLine();
+					int count = System::Int32::Parse(line);
+					int i;
+
+					for(i=0; i < count; i++)
+					{
+						CompoEntry^ ce = gcnew CompoEntry;
+						ce->composer = inf->ReadLine();
+						ce->filename = inf->ReadLine();
+						ce->songtitle = inf->ReadLine();
+						songs->Add(ce);
+					}
+					
+					// load votes
+					line = inf->ReadLine();
+					count = System::Int32::Parse(line);
+
+					for(i=0; i < count; i++)
+					{
+						VoteData^ vd = gcnew VoteData;
+
+						vd->votingfor = inf->ReadLine();
+						vd->votingby = inf->ReadLine();
+						int votecount = System::Int32::Parse(inf->ReadLine());
+						for(int j=0; j < votecount; j++)
+						{
+							vd->votes->Add(inf->ReadLine());
+						}
+						votes->Add(vd);
+					}
+
+					inf->Close();
+					
+					this->savefilePath = ofd->FileName;
+
+					// fill in data
+					this->open_new();
+
+					this->tabControl1->SelectedTab = this->entriesTab;
+
+					this->entriesList->Items->Clear();
+					for each (CompoEntry^ ce in songs)
+					{
+						ListViewItem^ new_item = gcnew ListViewItem(gcnew array<String^>{"", "", "", ""});
+						new_item->Tag = ce;
+						this->entriesList->Items->Add(new_item);
+						this->match_entrylist_to_entry(new_item);
+					}
+					this->entriesList->Items->Add(_empty_item);
+					this->entriesList->Sort();
+
+					// fill in votes
+					if (votes->Count > 0)
+					{
+						this->tabControl1->SelectedTab = this->tabPage2;
+					}
+
+					for each (VoteData^ vd in votes)
+					{
+						System::Windows::Forms::ColumnHeader ^newhead = this->voteList->Columns->Add(vd->votingby);
+						newhead->Tag = vd;
+						int idx = newhead->Index;
+	
+						i=0;
+						for each (System::Windows::Forms::ListViewItem^ lvi in this->voteList->Items)
+						{
+							while (lvi->SubItems->Count < idx+1)
+							{
+								lvi->SubItems->Add(L"");
+							}
+	
+							System::Windows::Forms::ListViewItem::ListViewSubItem^ si = lvi->SubItems[idx];
+							si->Text = (String^)(vd->votes[i]);
+							
+							i++;
+						}
+						while (i < vd->votes->Count)
+						{
+							System::Windows::Forms::ListViewItem^ nlvi = this->voteList->Items->Add(L"");
+							
+							while (nlvi->SubItems->Count < idx+1)
+							{
+								nlvi->SubItems->Add(L"");
+							}
+							System::Windows::Forms::ListViewItem::ListViewSubItem^ si = nlvi->SubItems[idx];
+							si->Text = (String^)(vd->votes[i]);
+							i++;
+						}
+		
+					}
+
+					return true;
+				}
+				catch(...)
+				{
+					System::Windows::Forms::MessageBox::Show(
+						L"Some error occurred while loading.\nYou should probably exit the program to\nreturn to a consistent state.",
+						L"Bzzt",
+						System::Windows::Forms::MessageBoxButtons::OK);
+					return false;
+				}
+			}
+			else
+			{
+				return false;
+			}
+		}
+
+		private: System::Void newToolStripMenuItem_Click(System::Object^  sender, System::EventArgs^  e)
+		{
+			System::Windows::Forms::DialogResult dr = System::Windows::Forms::MessageBox::Show(
+				L"You'll lose unsaved work. Save first?",
+				L"Which is chosen?",
+				System::Windows::Forms::MessageBoxButtons::YesNoCancel);
+			if (dr == System::Windows::Forms::DialogResult::Cancel)
+			{
+				return;
+			}
+			else if (dr == System::Windows::Forms::DialogResult::Yes)
+			{
+				if (this->save(false))
+				{
+					this->open_new();
+				}
+				// not saved: don't clear data
+			}
+			else
+			{
+				this->open_new();
+			}
+		}
+
+		private: System::Void saveToolStripMenuItem_Click(System::Object^  sender, System::EventArgs^  e)
+		{
+			this->save(false);
+		}
+		private: System::Void saveAsToolStripMenuItem_Click(System::Object^  sender, System::EventArgs^  e)
+		{
+			this->save(true);
+		}
+
+		private: System::Void openToolStripMenuItem_Click(System::Object^  sender, System::EventArgs^  e)
+		{
+			System::Windows::Forms::DialogResult dr = System::Windows::Forms::MessageBox::Show(
+				L"You'll lose unsaved work. Save first?",
+				L"Which is chosen?",
+				System::Windows::Forms::MessageBoxButtons::YesNoCancel);
+			if (dr == System::Windows::Forms::DialogResult::Cancel)
+			{
+				return;
+			}
+			else if (dr == System::Windows::Forms::DialogResult::Yes)
+			{
+				if (this->save(false))
+				{
+					this->open_file();
+				}
+				// not saved: don't clear data
+			}
+			else
+			{
+				this->open_file();
+			}
 		}
 };
 

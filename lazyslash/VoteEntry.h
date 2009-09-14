@@ -322,8 +322,11 @@ namespace lazyslash {
 			}
 			else
 			{
-				if (this->voterCombo->SelectedIndex != 0)
+				if ((this->voterCombo->SelectedIndex != 0) &&
+					(this->chosenBox->Items->Count > 0))
 				{
+					// ensure that voter's own entry is last
+					
 					CompoEntry ^ce = (CompoEntry^)(this->chosenBox->Items[this->chosenBox->Items->Count-1]->Tag);
 					if (ce->composer != (String^)(this->voterCombo->SelectedItem))
 					{
@@ -333,7 +336,9 @@ namespace lazyslash {
 					{
 						this->okButton->Enabled = true;
 					}
+					
 				}
+
 				else
 				{
 					this->okButton->Enabled = true;
