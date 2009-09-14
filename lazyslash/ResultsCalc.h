@@ -135,7 +135,7 @@ private:
 					place.ToString() + 
 					" -=> " + 
 					songname + 
-					" <=- Done by -=> " +
+					" <=- done by -=> " +
 					ce->composer +
 					" <=- with " +
 					ce->score.ToString() +

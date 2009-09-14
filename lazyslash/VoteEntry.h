@@ -266,7 +266,7 @@ namespace lazyslash {
 			this->okButton->Name = L"okButton";
 			this->okButton->Size = System::Drawing::Size(75, 23);
 			this->okButton->TabIndex = 6;
-			this->okButton->Text = L"OK";
+			this->okButton->Text = L"&OK";
 			this->okButton->UseVisualStyleBackColor = true;
 			this->okButton->Click += gcnew System::EventHandler(this, &VoteEntry::okButton_Click);
 			// 
@@ -277,7 +277,7 @@ namespace lazyslash {
 			this->canButton->Name = L"canButton";
 			this->canButton->Size = System::Drawing::Size(75, 23);
 			this->canButton->TabIndex = 7;
-			this->canButton->Text = L"Cancel";
+			this->canButton->Text = L"C&ancel";
 			this->canButton->UseVisualStyleBackColor = true;
 			// 
 			// unVoteBtn
