@@ -116,6 +116,9 @@ namespace lazyslash {
 	private: System::Windows::Forms::Label^  exportTxtLabel;
 	private: System::Windows::Forms::ToolStripMenuItem^  addNewToolStripMenuItem;
 	private: System::Windows::Forms::ToolStripMenuItem^  openToolStripMenuItem;
+
+	private: System::Windows::Forms::ToolStripSeparator^  toolStripSeparator2;
+	private: System::Windows::Forms::ToolStripMenuItem^  copyToolStripMenuItem;
 			 int sort_col;
 
 		/// <summary>
@@ -189,8 +192,9 @@ namespace lazyslash {
 			this->columnHeader2 = (gcnew System::Windows::Forms::ColumnHeader());
 			this->columnHeader3 = (gcnew System::Windows::Forms::ColumnHeader());
 			this->entriesMenuStrip = (gcnew System::Windows::Forms::ContextMenuStrip(this->components));
-			this->removeToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
 			this->addNewToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
+			this->removeToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
+			this->copyToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
 			this->txtCompoName1 = (gcnew System::Windows::Forms::TextBox());
 			this->label1 = (gcnew System::Windows::Forms::Label());
 			this->entriesLabel = (gcnew System::Windows::Forms::Label());
@@ -211,6 +215,7 @@ namespace lazyslash {
 			this->openToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
 			this->saveToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
 			this->saveAsToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
+			this->toolStripSeparator2 = (gcnew System::Windows::Forms::ToolStripSeparator());
 			this->exitToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
 			this->aboutToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
 			this->tabControl1->SuspendLayout();
@@ -319,28 +324,36 @@ namespace lazyslash {
 			// 
 			// entriesMenuStrip
 			// 
-			this->entriesMenuStrip->Items->AddRange(gcnew cli::array< System::Windows::Forms::ToolStripItem^  >(2) {this->removeToolStripMenuItem, 
-				this->addNewToolStripMenuItem});
+			this->entriesMenuStrip->Items->AddRange(gcnew cli::array< System::Windows::Forms::ToolStripItem^  >(3) {this->addNewToolStripMenuItem, 
+				this->removeToolStripMenuItem, this->copyToolStripMenuItem});
 			this->entriesMenuStrip->Name = L"entriesMenuStrip";
 			this->entriesMenuStrip->RenderMode = System::Windows::Forms::ToolStripRenderMode::System;
-			this->entriesMenuStrip->Size = System::Drawing::Size(169, 48);
+			this->entriesMenuStrip->Size = System::Drawing::Size(204, 70);
 			this->entriesMenuStrip->Opening += gcnew System::ComponentModel::CancelEventHandler(this, &CompoWindow::entriesMenuStrip_Opening);
+			// 
+			// addNewToolStripMenuItem
+			// 
+			this->addNewToolStripMenuItem->Name = L"addNewToolStripMenuItem";
+			this->addNewToolStripMenuItem->ShortcutKeys = static_cast<System::Windows::Forms::Keys>((System::Windows::Forms::Keys::Control | System::Windows::Forms::Keys::A));
+			this->addNewToolStripMenuItem->Size = System::Drawing::Size(203, 22);
+			this->addNewToolStripMenuItem->Text = L"&Add new...";
+			this->addNewToolStripMenuItem->Click += gcnew System::EventHandler(this, &CompoWindow::addNewToolStripMenuItem_Click);
 			// 
 			// removeToolStripMenuItem
 			// 
 			this->removeToolStripMenuItem->Name = L"removeToolStripMenuItem";
 			this->removeToolStripMenuItem->ShortcutKeys = System::Windows::Forms::Keys::Delete;
-			this->removeToolStripMenuItem->Size = System::Drawing::Size(168, 22);
+			this->removeToolStripMenuItem->Size = System::Drawing::Size(203, 22);
 			this->removeToolStripMenuItem->Text = L"&Remove";
 			this->removeToolStripMenuItem->Click += gcnew System::EventHandler(this, &CompoWindow::removeToolStripMenuItem_Click);
 			// 
-			// addNewToolStripMenuItem
+			// copyToolStripMenuItem
 			// 
-			this->addNewToolStripMenuItem->Name = L"addNewToolStripMenuItem";
-			this->addNewToolStripMenuItem->ShortcutKeys = static_cast<System::Windows::Forms::Keys>((System::Windows::Forms::Keys::Control | System::Windows::Forms::Keys::N));
-			this->addNewToolStripMenuItem->Size = System::Drawing::Size(168, 22);
-			this->addNewToolStripMenuItem->Text = L"Add &New...";
-			this->addNewToolStripMenuItem->Click += gcnew System::EventHandler(this, &CompoWindow::addNewToolStripMenuItem_Click);
+			this->copyToolStripMenuItem->Name = L"copyToolStripMenuItem";
+			this->copyToolStripMenuItem->ShortcutKeys = static_cast<System::Windows::Forms::Keys>((System::Windows::Forms::Keys::Control | System::Windows::Forms::Keys::C));
+			this->copyToolStripMenuItem->Size = System::Drawing::Size(203, 22);
+			this->copyToolStripMenuItem->Text = L"Copy filename/title";
+			this->copyToolStripMenuItem->Click += gcnew System::EventHandler(this, &CompoWindow::copyToolStripMenuItem_Click);
 			// 
 			// txtCompoName1
 			// 
@@ -447,22 +460,22 @@ namespace lazyslash {
 				this->pasteToolStripMenuItem});
 			this->votesMenuStrip->Name = L"votesMenuStrip";
 			this->votesMenuStrip->RenderMode = System::Windows::Forms::ToolStripRenderMode::System;
-			this->votesMenuStrip->Size = System::Drawing::Size(169, 48);
+			this->votesMenuStrip->Size = System::Drawing::Size(168, 48);
 			// 
 			// addToolStripMenuItem
 			// 
 			this->addToolStripMenuItem->Name = L"addToolStripMenuItem";
-			this->addToolStripMenuItem->ShortcutKeys = static_cast<System::Windows::Forms::Keys>((System::Windows::Forms::Keys::Control | System::Windows::Forms::Keys::N));
-			this->addToolStripMenuItem->Size = System::Drawing::Size(168, 22);
-			this->addToolStripMenuItem->Text = L"Add New...";
+			this->addToolStripMenuItem->ShortcutKeys = static_cast<System::Windows::Forms::Keys>((System::Windows::Forms::Keys::Control | System::Windows::Forms::Keys::A));
+			this->addToolStripMenuItem->Size = System::Drawing::Size(167, 22);
+			this->addToolStripMenuItem->Text = L"&Add new...";
 			this->addToolStripMenuItem->Click += gcnew System::EventHandler(this, &CompoWindow::addToolStripMenuItem_Click);
 			// 
 			// pasteToolStripMenuItem
 			// 
 			this->pasteToolStripMenuItem->Name = L"pasteToolStripMenuItem";
 			this->pasteToolStripMenuItem->ShortcutKeys = static_cast<System::Windows::Forms::Keys>((System::Windows::Forms::Keys::Control | System::Windows::Forms::Keys::V));
-			this->pasteToolStripMenuItem->Size = System::Drawing::Size(168, 22);
-			this->pasteToolStripMenuItem->Text = L"Paste...";
+			this->pasteToolStripMenuItem->Size = System::Drawing::Size(167, 22);
+			this->pasteToolStripMenuItem->Text = L"&Paste...";
 			this->pasteToolStripMenuItem->Click += gcnew System::EventHandler(this, &CompoWindow::pasteToolStripMenuItem_Click);
 			// 
 			// txtCompoName2
@@ -510,8 +523,8 @@ namespace lazyslash {
 			// 
 			// fileToolStripMenuItem
 			// 
-			this->fileToolStripMenuItem->DropDownItems->AddRange(gcnew cli::array< System::Windows::Forms::ToolStripItem^  >(5) {this->newToolStripMenuItem, 
-				this->openToolStripMenuItem, this->saveToolStripMenuItem, this->saveAsToolStripMenuItem, this->exitToolStripMenuItem});
+			this->fileToolStripMenuItem->DropDownItems->AddRange(gcnew cli::array< System::Windows::Forms::ToolStripItem^  >(6) {this->newToolStripMenuItem, 
+				this->openToolStripMenuItem, this->saveToolStripMenuItem, this->saveAsToolStripMenuItem, this->toolStripSeparator2, this->exitToolStripMenuItem});
 			this->fileToolStripMenuItem->Name = L"fileToolStripMenuItem";
 			this->fileToolStripMenuItem->Size = System::Drawing::Size(35, 20);
 			this->fileToolStripMenuItem->Text = L"&File";
@@ -519,6 +532,7 @@ namespace lazyslash {
 			// newToolStripMenuItem
 			// 
 			this->newToolStripMenuItem->Name = L"newToolStripMenuItem";
+			this->newToolStripMenuItem->ShortcutKeys = static_cast<System::Windows::Forms::Keys>((System::Windows::Forms::Keys::Control | System::Windows::Forms::Keys::N));
 			this->newToolStripMenuItem->Size = System::Drawing::Size(152, 22);
 			this->newToolStripMenuItem->Text = L"&New";
 			this->newToolStripMenuItem->Click += gcnew System::EventHandler(this, &CompoWindow::newToolStripMenuItem_Click);
@@ -526,6 +540,7 @@ namespace lazyslash {
 			// openToolStripMenuItem
 			// 
 			this->openToolStripMenuItem->Name = L"openToolStripMenuItem";
+			this->openToolStripMenuItem->ShortcutKeys = static_cast<System::Windows::Forms::Keys>((System::Windows::Forms::Keys::Control | System::Windows::Forms::Keys::O));
 			this->openToolStripMenuItem->Size = System::Drawing::Size(152, 22);
 			this->openToolStripMenuItem->Text = L"Open";
 			this->openToolStripMenuItem->Click += gcnew System::EventHandler(this, &CompoWindow::openToolStripMenuItem_Click);
@@ -533,6 +548,7 @@ namespace lazyslash {
 			// saveToolStripMenuItem
 			// 
 			this->saveToolStripMenuItem->Name = L"saveToolStripMenuItem";
+			this->saveToolStripMenuItem->ShortcutKeys = static_cast<System::Windows::Forms::Keys>((System::Windows::Forms::Keys::Control | System::Windows::Forms::Keys::S));
 			this->saveToolStripMenuItem->Size = System::Drawing::Size(152, 22);
 			this->saveToolStripMenuItem->Text = L"&Save";
 			this->saveToolStripMenuItem->Click += gcnew System::EventHandler(this, &CompoWindow::saveToolStripMenuItem_Click);
@@ -543,6 +559,11 @@ namespace lazyslash {
 			this->saveAsToolStripMenuItem->Size = System::Drawing::Size(152, 22);
 			this->saveAsToolStripMenuItem->Text = L"Save &As...";
 			this->saveAsToolStripMenuItem->Click += gcnew System::EventHandler(this, &CompoWindow::saveAsToolStripMenuItem_Click);
+			// 
+			// toolStripSeparator2
+			// 
+			this->toolStripSeparator2->Name = L"toolStripSeparator2";
+			this->toolStripSeparator2->Size = System::Drawing::Size(149, 6);
 			// 
 			// exitToolStripMenuItem
 			// 
@@ -555,6 +576,7 @@ namespace lazyslash {
 			// aboutToolStripMenuItem
 			// 
 			this->aboutToolStripMenuItem->Name = L"aboutToolStripMenuItem";
+			this->aboutToolStripMenuItem->ShortcutKeys = System::Windows::Forms::Keys::F1;
 			this->aboutToolStripMenuItem->Size = System::Drawing::Size(48, 20);
 			this->aboutToolStripMenuItem->Text = L"&About";
 			this->aboutToolStripMenuItem->Click += gcnew System::EventHandler(this, &CompoWindow::aboutToolStripMenuItem_Click);
@@ -740,11 +762,13 @@ namespace lazyslash {
 				!(this->entriesList->SelectedItems->Count == 1 &&
 				this->entriesList->SelectedItems[0] == this->_empty_item))
 			{
-				this->entriesMenuStrip->Items[0]->Enabled = true;
+				this->entriesMenuStrip->Items[1]->Enabled = true;
+				this->entriesMenuStrip->Items[2]->Enabled = true;
 			}
 			else
 			{
-				this->entriesMenuStrip->Items[0]->Enabled = false;
+				this->entriesMenuStrip->Items[1]->Enabled = false;
+				this->entriesMenuStrip->Items[2]->Enabled = false;
 			}
 		}
 
@@ -907,17 +931,21 @@ namespace lazyslash {
 					voter = m_nick->Groups[1]->Value;
 					start_votelook = m_nick->Index+m_nick->Length;
 				}
-				System::Text::RegularExpressions::Regex re_songs(L"[^a-zA-Z0-9_]+([a-zA-Z0-9_\.]+)", System::Text::RegularExpressions::RegexOptions::IgnoreCase);
+				System::Text::RegularExpressions::Regex re_songs(L"[^a-zA-Z0-9_]*([0-9][0-9]?[\.:,;\-]?[^a-zA-Z0-9_]*)?([a-zA-Z0-9_\.]+)", System::Text::RegularExpressions::RegexOptions::IgnoreCase);
 				System::Text::RegularExpressions::Match^ m_songs = re_songs.Match(line, start_votelook);
 				
 				while (m_songs->Success)
 				{
-					votetokens->Add(System::IO::Path::GetFileNameWithoutExtension(m_songs->Groups[1]->Value));
+					votetokens->Add(System::IO::Path::GetFileNameWithoutExtension(m_songs->Groups[2]->Value));
 					m_songs = m_songs->NextMatch();
 				}
 			}
 			if (votetokens->Count == 0)
 			{
+				System::Windows::Forms::MessageBox::Show(
+					L"Pardon me. This program is too stupid\nto glean your desire from such\nwonderfully crafted data. Please try\nsomething else.",
+					L"Can't understand pasted data",
+					System::Windows::Forms::MessageBoxButtons::OK);
 				return;
 			}
 
@@ -1596,6 +1624,40 @@ namespace lazyslash {
 			{
 				this->open_file();
 			}
+		}
+		private: System::Void copyToolStripMenuItem_Click(System::Object^  sender, System::EventArgs^  e)
+		{
+			if (this->tabControl1->SelectedTab != this->entriesTab)
+			{
+				return;
+			}
+
+			String^ newclipdata = L"";
+
+			for each (System::Windows::Forms::ListViewItem^ copyitem in this->entriesList->SelectedItems)
+			{
+				if (copyitem != this->_empty_item)
+				{
+					if (newclipdata != L"")
+					{
+						newclipdata += "\n";
+					}
+
+					CompoEntry^ ce = (CompoEntry^)(copyitem->Tag);
+
+					newclipdata += ce->filename;
+					if (ce->songtitle != L"")
+					{
+						newclipdata += " (" + ce->songtitle + ")";
+					}
+
+				}
+			}
+			if (newclipdata != L"")
+			{
+				System::Windows::Forms::Clipboard::SetData(System::Windows::Forms::DataFormats::Text, newclipdata);
+			}
+
 		}
 };
 
