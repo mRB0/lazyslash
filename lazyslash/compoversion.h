@@ -10,7 +10,7 @@ using namespace System::Collections;
 using namespace System::Diagnostics;
 
 
-namespace lazyslash {
+namespace lazyslash { 
 	
 	/// <summary>
 	/// Summary for compoversion
