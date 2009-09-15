@@ -838,6 +838,7 @@ namespace lazyslash {
 					
 					// edit item
 					EntryEditor ee(ce, songs);
+					ee.StartPosition = System::Windows::Forms::FormStartPosition::CenterParent;
 					ee.ShowDialog();
 
 					// make list entry match CompoEntry tag
@@ -849,6 +850,8 @@ namespace lazyslash {
 					CompoEntry ^ce = gcnew CompoEntry();
 
 					EntryEditor ee(ce, songs);
+					ee.StartPosition = System::Windows::Forms::FormStartPosition::CenterParent;
+
 					if (ee.ShowDialog() == System::Windows::Forms::DialogResult::OK)
 					{
 						ListViewItem^ new_item = gcnew ListViewItem(gcnew array<String^>{L"",L"",L"",L""});
@@ -1067,6 +1070,7 @@ namespace lazyslash {
 			get_current_songs_entrants(songs, entrants);
 
 			VoteEntry ve(vd, entrants, songs);
+			ve.StartPosition = System::Windows::Forms::FormStartPosition::CenterParent;
 			
 
 			System::Windows::Forms::DialogResult dr = ve.ShowDialog();
@@ -1123,7 +1127,8 @@ namespace lazyslash {
 			}
 
 			VoteEntry ve(vd, entrants, songs);
-			
+			ve.StartPosition = System::Windows::Forms::FormStartPosition::CenterParent;
+
 			System::Windows::Forms::DialogResult dr = ve.ShowDialog();
 
 			if (dr == System::Windows::Forms::DialogResult::OK)
@@ -1286,6 +1291,7 @@ namespace lazyslash {
 				CompoEntry ^ce = gcnew CompoEntry();
 
 				EntryEditor ee(ce, songs);
+				ee.StartPosition = System::Windows::Forms::FormStartPosition::CenterParent;
 				if (ee.ShowDialog() == System::Windows::Forms::DialogResult::OK)
 				{
 					ListViewItem^ new_item = gcnew ListViewItem(gcnew array<String^>{L"",L"",L"",L""});

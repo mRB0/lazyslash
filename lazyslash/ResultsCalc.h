@@ -240,7 +240,7 @@ private:
 			results += "These results were generated using lazyslash compomagoo " + 
 				compoversion::version + 
 				" " +
-				compoversion::svnid +
+				compoversion::svnrevision +
 				" (c) 2009 Mike Burke (mrb) - mrburke@gmail.com\n";
 
 			// oops windows
