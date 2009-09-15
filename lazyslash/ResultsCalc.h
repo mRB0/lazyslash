@@ -237,7 +237,11 @@ private:
 			}
 
 			results += "-----<O>-----\n";
-			results += "These results were generated using lazyslash compomagoo " + compoversion::version + " (c) 2009 Mike Burke (mrb) - mrburke@gmail.com\n";
+			results += "These results were generated using lazyslash compomagoo " + 
+				compoversion::version + 
+				" " +
+				compoversion::svnid +
+				" (c) 2009 Mike Burke (mrb) - mrburke@gmail.com\n";
 
 			// oops windows
 			results = results->Replace("\n", "\r\n");
