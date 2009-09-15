@@ -1262,7 +1262,9 @@ namespace lazyslash {
 		private: System::Void aboutToolStripMenuItem_Click(System::Object^  sender, System::EventArgs^  e)
 		{
 			System::Windows::Forms::MessageBox::Show(
-				L"lazyslash compomagoo " + compoversion::version + "\ncompo management system\n\n(c) 2009 Mike Burke (mrb)\nmrburke@gmail.com",
+				L"lazyslash compomagoo " + compoversion::version + "\ncompo management system\n\n" +
+				compoversion::svnid +
+				L"\n\n(c) 2009 Mike Burke (mrb)\nmrburke@gmail.com",
 				L"Aboot",
 				System::Windows::Forms::MessageBoxButtons::OK);
 		}

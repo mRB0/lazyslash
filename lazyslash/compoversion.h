@@ -18,8 +18,9 @@ namespace lazyslash {
 	public ref class compoversion
 	{
 	public:
-		static String^ version = "0.1.1";
-		static String^ svnrevision = "$Rev$";
+		static String^ version = L"0.1.1";
+		static String^ svnrevision = L"$Rev$";
+		static String^ svnid = L"$Id$";
 
 		compoversion(void)
 		{
