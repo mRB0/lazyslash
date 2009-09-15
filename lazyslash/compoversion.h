@@ -1,5 +1,9 @@
 #pragma once
 
+/*
+ * $Id$
+ */
+
 using namespace System;
 using namespace System::ComponentModel;
 using namespace System::Collections;
@@ -15,6 +19,7 @@ namespace lazyslash {
 	{
 	public:
 		static String^ version = "0.1.1";
+		static String^ svnrevision = "$Rev$";
 
 		compoversion(void)
 		{
