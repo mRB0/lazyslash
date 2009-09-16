@@ -1,3 +1,7 @@
+/*
+ * $Id$
+ */
+
 #pragma once
 
 using namespace System;
