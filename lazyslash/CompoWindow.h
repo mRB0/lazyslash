@@ -716,7 +716,7 @@ namespace lazyslash {
 			{
 				String^ filename = System::IO::Path::GetFileName(file);
 
-				String^ songtitle = TrackerMod::GetSongTitle(file)->TrimEnd(0);
+				String^ songtitle = TrackerMod::GetSongTitle(file)->TrimEnd(nullptr);
 				//int songlen = songtitle->Length;
 				
 				ListViewItem^ new_item = gcnew ListViewItem(gcnew array<String^>{"", "", filename, songtitle});
