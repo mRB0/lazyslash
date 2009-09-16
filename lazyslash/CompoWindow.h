@@ -1272,7 +1272,8 @@ namespace lazyslash {
 		{
 			System::Windows::Forms::MessageBox::Show(
 				L"lazyslash compomagoo " + compoversion::version + "\ncompo management system\n\n" +
-				compoversion::svnid +
+				L"svn rev " + compoversion::svnrevision +
+				L" (" + compoversion::svnrevdate + L")" +
 				L"\n\n(c) 2009 Mike Burke (mrb)\nmrburke@gmail.com",
 				L"Aboot",
 				System::Windows::Forms::MessageBoxButtons::OK);
