@@ -26,9 +26,14 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
+				Description="Updating SVN revision data"
+				CommandLine="C:\code\svnrev.exe *"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
+				Description=""
+				CommandLine=""
+				Outputs=""
 			/>
 			<Tool
 				Name="VCXMLDataGeneratorTool"
@@ -100,6 +105,8 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
+				Description="Updating SVN revision data"
+				CommandLine="C:\code\svnrev.exe *"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -205,7 +212,31 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CompoEntry.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\compoversion.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\EntryEditor.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\lazyslash.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ListViewItemComparer.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ResultsCalc.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ResultsDisplay.cpp"
 				>
 			</File>
 			<File
@@ -232,6 +263,14 @@
 				RelativePath=".\TrackerMod.cpp"
 				>
 			</File>
+			<File
+				RelativePath=".\VoteData.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\VoteEntry.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -239,16 +278,8 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath=".\CompoEntry.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\CompoEntry.h"
 				FileType="1"
-				>
-			</File>
-			<File
-				RelativePath=".\compoversion.cpp"
 				>
 			</File>
 			<File
@@ -267,10 +298,6 @@
 				</File>
 			</File>
 			<File
-				RelativePath=".\EntryEditor.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\EntryEditor.h"
 				FileType="3"
 				>
@@ -278,10 +305,6 @@
 					RelativePath=".\EntryEditor.resx"
 					>
 				</File>
-			</File>
-			<File
-				RelativePath=".\ListViewItemComparer.cpp"
-				>
 			</File>
 			<File
 				RelativePath=".\ListViewItemComparer.h"
@@ -293,16 +316,8 @@
 				>
 			</File>
 			<File
-				RelativePath=".\ResultsCalc.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\ResultsCalc.h"
 				FileType="1"
-				>
-			</File>
-			<File
-				RelativePath=".\ResultsDisplay.cpp"
 				>
 			</File>
 			<File
@@ -319,21 +334,17 @@
 				>
 			</File>
 			<File
+				RelativePath=".\svnrev.h"
+				>
+			</File>
+			<File
 				RelativePath=".\TrackerMod.h"
 				FileType="1"
 				>
 			</File>
 			<File
-				RelativePath=".\VoteData.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\VoteData.h"
 				FileType="1"
-				>
-			</File>
-			<File
-				RelativePath=".\VoteEntry.cpp"
 				>
 			</File>
 			<File
