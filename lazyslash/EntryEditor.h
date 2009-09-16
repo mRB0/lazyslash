@@ -1,5 +1,9 @@
 #pragma once
 
+/*
+ * $Id$
+ */
+
 #include "CompoEntry.h"
 
 using namespace System;
