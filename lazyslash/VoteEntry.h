@@ -142,6 +142,7 @@ namespace lazyslash {
 		/// </summary>
 		void InitializeComponent(void)
 		{
+			System::ComponentModel::ComponentResourceManager^  resources = (gcnew System::ComponentModel::ComponentResourceManager(VoteEntry::typeid));
 			this->label1 = (gcnew System::Windows::Forms::Label());
 			this->voterCombo = (gcnew System::Windows::Forms::ComboBox());
 			this->label2 = (gcnew System::Windows::Forms::Label());
@@ -310,6 +311,7 @@ namespace lazyslash {
 			this->Controls->Add(this->label2);
 			this->Controls->Add(this->voterCombo);
 			this->Controls->Add(this->label1);
+			this->Icon = (cli::safe_cast<System::Drawing::Icon^  >(resources->GetObject(L"$this.Icon")));
 			this->Name = L"VoteEntry";
 			this->Text = L"VoteEntry";
 			this->ResumeLayout(false);

@@ -63,6 +63,7 @@ namespace lazyslash {
 		/// </summary>
 		void InitializeComponent(void)
 		{
+			System::ComponentModel::ComponentResourceManager^  resources = (gcnew System::ComponentModel::ComponentResourceManager(ResultsDisplay::typeid));
 			this->closeButton = (gcnew System::Windows::Forms::Button());
 			this->resultsBox = (gcnew System::Windows::Forms::TextBox());
 			this->SuspendLayout();
@@ -101,6 +102,7 @@ namespace lazyslash {
 			this->ClientSize = System::Drawing::Size(632, 328);
 			this->Controls->Add(this->resultsBox);
 			this->Controls->Add(this->closeButton);
+			this->Icon = (cli::safe_cast<System::Drawing::Icon^  >(resources->GetObject(L"$this.Icon")));
 			this->Name = L"ResultsDisplay";
 			this->Text = L"Results!";
 			this->ResumeLayout(false);

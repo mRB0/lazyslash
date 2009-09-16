@@ -186,6 +186,7 @@ namespace lazyslash {
 		void InitializeComponent(void)
 		{
 			this->components = (gcnew System::ComponentModel::Container());
+			System::ComponentModel::ComponentResourceManager^  resources = (gcnew System::ComponentModel::ComponentResourceManager(CompoWindow::typeid));
 			this->tabControl1 = (gcnew System::Windows::Forms::TabControl());
 			this->entriesTab = (gcnew System::Windows::Forms::TabPage());
 			this->zipErrorLabel = (gcnew System::Windows::Forms::Label());
@@ -464,7 +465,8 @@ namespace lazyslash {
 				this->pasteToolStripMenuItem});
 			this->votesMenuStrip->Name = L"votesMenuStrip";
 			this->votesMenuStrip->RenderMode = System::Windows::Forms::ToolStripRenderMode::System;
-			this->votesMenuStrip->Size = System::Drawing::Size(168, 48);
+			this->votesMenuStrip->Size = System::Drawing::Size(168, 70);
+			this->votesMenuStrip->Opening += gcnew System::ComponentModel::CancelEventHandler(this, &CompoWindow::votesMenuStrip_Opening);
 			// 
 			// addToolStripMenuItem
 			// 
@@ -537,7 +539,7 @@ namespace lazyslash {
 			// 
 			this->newToolStripMenuItem->Name = L"newToolStripMenuItem";
 			this->newToolStripMenuItem->ShortcutKeys = static_cast<System::Windows::Forms::Keys>((System::Windows::Forms::Keys::Control | System::Windows::Forms::Keys::N));
-			this->newToolStripMenuItem->Size = System::Drawing::Size(152, 22);
+			this->newToolStripMenuItem->Size = System::Drawing::Size(140, 22);
 			this->newToolStripMenuItem->Text = L"&New";
 			this->newToolStripMenuItem->Click += gcnew System::EventHandler(this, &CompoWindow::newToolStripMenuItem_Click);
 			// 
@@ -545,7 +547,7 @@ namespace lazyslash {
 			// 
 			this->openToolStripMenuItem->Name = L"openToolStripMenuItem";
 			this->openToolStripMenuItem->ShortcutKeys = static_cast<System::Windows::Forms::Keys>((System::Windows::Forms::Keys::Control | System::Windows::Forms::Keys::O));
-			this->openToolStripMenuItem->Size = System::Drawing::Size(152, 22);
+			this->openToolStripMenuItem->Size = System::Drawing::Size(140, 22);
 			this->openToolStripMenuItem->Text = L"Open";
 			this->openToolStripMenuItem->Click += gcnew System::EventHandler(this, &CompoWindow::openToolStripMenuItem_Click);
 			// 
@@ -553,27 +555,27 @@ namespace lazyslash {
 			// 
 			this->saveToolStripMenuItem->Name = L"saveToolStripMenuItem";
 			this->saveToolStripMenuItem->ShortcutKeys = static_cast<System::Windows::Forms::Keys>((System::Windows::Forms::Keys::Control | System::Windows::Forms::Keys::S));
-			this->saveToolStripMenuItem->Size = System::Drawing::Size(152, 22);
+			this->saveToolStripMenuItem->Size = System::Drawing::Size(140, 22);
 			this->saveToolStripMenuItem->Text = L"&Save";
 			this->saveToolStripMenuItem->Click += gcnew System::EventHandler(this, &CompoWindow::saveToolStripMenuItem_Click);
 			// 
 			// saveAsToolStripMenuItem
 			// 
 			this->saveAsToolStripMenuItem->Name = L"saveAsToolStripMenuItem";
-			this->saveAsToolStripMenuItem->Size = System::Drawing::Size(152, 22);
+			this->saveAsToolStripMenuItem->Size = System::Drawing::Size(140, 22);
 			this->saveAsToolStripMenuItem->Text = L"Save &As...";
 			this->saveAsToolStripMenuItem->Click += gcnew System::EventHandler(this, &CompoWindow::saveAsToolStripMenuItem_Click);
 			// 
 			// toolStripSeparator2
 			// 
 			this->toolStripSeparator2->Name = L"toolStripSeparator2";
-			this->toolStripSeparator2->Size = System::Drawing::Size(149, 6);
+			this->toolStripSeparator2->Size = System::Drawing::Size(137, 6);
 			// 
 			// exitToolStripMenuItem
 			// 
 			this->exitToolStripMenuItem->Name = L"exitToolStripMenuItem";
 			this->exitToolStripMenuItem->ShortcutKeys = static_cast<System::Windows::Forms::Keys>((System::Windows::Forms::Keys::Alt | System::Windows::Forms::Keys::F4));
-			this->exitToolStripMenuItem->Size = System::Drawing::Size(152, 22);
+			this->exitToolStripMenuItem->Size = System::Drawing::Size(140, 22);
 			this->exitToolStripMenuItem->Text = L"E&xit";
 			this->exitToolStripMenuItem->Click += gcnew System::EventHandler(this, &CompoWindow::exitToolStripMenuItem_Click);
 			// 
@@ -592,6 +594,7 @@ namespace lazyslash {
 			this->ClientSize = System::Drawing::Size(438, 341);
 			this->Controls->Add(this->tabControl1);
 			this->Controls->Add(this->mainMenuStrip);
+			this->Icon = (cli::safe_cast<System::Drawing::Icon^  >(resources->GetObject(L"$this.Icon")));
 			this->MainMenuStrip = this->mainMenuStrip;
 			this->Name = L"CompoWindow";
 			this->Text = L"lazyslash compomagoo";
@@ -922,115 +925,130 @@ namespace lazyslash {
 			 * figure out votes on clipboard data
 			 */
 
-			array<String^>^ pastedata = ((String^)(System::Windows::Forms::Clipboard::GetData(System::Windows::Forms::DataFormats::Text)))->Replace(L"\r", L"")->Split(L'\n');
-			String^ voter = nullptr;
-			ArrayList^ votetokens = gcnew ArrayList;
-			
-			for each (String^ line in pastedata)
+			try
 			{
-	
-				System::Text::RegularExpressions::Regex re_nick(L"[^<]*<([^>]+)>");
-				System::Text::RegularExpressions::Match^ m_nick = re_nick.Match(line);
-				int start_votelook = 0;
+				String^ pastedstr = ((String^)(System::Windows::Forms::Clipboard::GetData(System::Windows::Forms::DataFormats::Text)));
+				if (pastedstr == nullptr)
+				{
+					/*
+					System::Windows::Forms::MessageBox::Show(
+						L"Whatever it is you're trying to paste,\nit ain't workin'.",
+						L"Inappropriate stuff on clipboard",
+						System::Windows::Forms::MessageBoxButtons::OK);
+					*/
+					return;
+				}
 
-				if (m_nick->Success)
-				{
-					voter = m_nick->Groups[1]->Value;
-					start_votelook = m_nick->Index+m_nick->Length;
-				}
-				System::Text::RegularExpressions::Regex re_songs(L"[^a-zA-Z0-9_]*([0-9][0-9]?[\.:,;\-]?[^a-zA-Z0-9_]*)?([a-zA-Z0-9_\.]+)", System::Text::RegularExpressions::RegexOptions::IgnoreCase);
-				System::Text::RegularExpressions::Match^ m_songs = re_songs.Match(line, start_votelook);
+				array<String^>^ pastedata = pastedstr->Replace(L"\r", L"")->Split(L'\n');
+				String^ voter = nullptr;
+				ArrayList^ votetokens = gcnew ArrayList;
 				
-				while (m_songs->Success)
+				for each (String^ line in pastedata)
 				{
-					votetokens->Add(System::IO::Path::GetFileNameWithoutExtension(m_songs->Groups[2]->Value));
-					m_songs = m_songs->NextMatch();
+		
+					System::Text::RegularExpressions::Regex re_nick(L"[^<]*<([^>]+)>");
+					System::Text::RegularExpressions::Match^ m_nick = re_nick.Match(line);
+					int start_votelook = 0;
+	
+					if (m_nick->Success)
+					{
+						voter = m_nick->Groups[1]->Value;
+						start_votelook = m_nick->Index+m_nick->Length;
+					}
+					System::Text::RegularExpressions::Regex re_songs(L"[^a-zA-Z0-9_]*([0-9][0-9]?[\.:,;\-]?[^a-zA-Z0-9_]*)?([a-zA-Z0-9_\.]+)", System::Text::RegularExpressions::RegexOptions::IgnoreCase);
+					System::Text::RegularExpressions::Match^ m_songs = re_songs.Match(line, start_votelook);
+					
+					while (m_songs->Success)
+					{
+						votetokens->Add(System::IO::Path::GetFileNameWithoutExtension(m_songs->Groups[2]->Value));
+						m_songs = m_songs->NextMatch();
+					}
 				}
+				if (votetokens->Count == 0)
+				{
+					System::Windows::Forms::MessageBox::Show(
+						L"Pardon me. This program is too stupid\nto glean your desire from such\nwonderfully crafted data. Please try\nsomething else.",
+						L"Can't understand pasted data",
+						System::Windows::Forms::MessageBoxButtons::OK);
+					return;
+				}
+
+				VoteData^ vd = gcnew VoteData;
+				
+				ArrayList^ songs = gcnew ArrayList;
+				ArrayList^ entrants = gcnew ArrayList;
+				get_current_songs_entrants(songs, entrants);
+	
+				if (voter != nullptr)
+				{
+					vd->votingby = voter;
+	
+					for each (System::Windows::Forms::ListViewItem^ lvi in this->entriesList->Items)
+					{
+						if (lvi == this->_empty_item)
+						{
+							continue;
+						}
+	
+						CompoEntry^ ce = (CompoEntry^)(lvi->Tag);
+						
+						// !ce->voted is the same as checking if the song is in the vote list
+						// (or contained in the "entrants" list returned by get_current_song_entrants)
+						// ...
+						// but i don't trust it because it is intended for user-end
+						//if (!ce->voted && ce->composer == voter)
+						if (entrants->Contains(voter) && ce->composer == voter)
+						{
+							vd->votingfor = voter;
+							break;
+						}
+					}
+				}
+	
+				for each (String^ vote in votetokens)
+				{
+					int lowestlscore = -1;
+					String ^result = nullptr;
+	
+					for each (System::Windows::Forms::ListViewItem^ lvi in this->entriesList->Items)
+					{
+						if (lvi == this->_empty_item)
+						{
+							continue;
+						}
+	
+						CompoEntry^ ce = (CompoEntry^)(lvi->Tag);
+	
+						if (vd->votes->Contains(ce->filename))
+						{
+							// already-found results are not eligible to be found again!
+							continue;
+						}
+	
+						int lscore = this->levenshtein(System::IO::Path::GetFileNameWithoutExtension(ce->filename), vote);
+						if (lscore < this->leven_threshold && (lowestlscore == -1 || lscore < lowestlscore))
+						{
+							lowestlscore = lscore;
+							result = ce->filename;
+						}
+					}
+	
+					if (result != nullptr)
+					{
+						vd->votes->Add(result);
+					}
+					
+				}
+	
+				this->add_voter(vd);
 			}
-			if (votetokens->Count == 0)
+			catch(...)
 			{
 				System::Windows::Forms::MessageBox::Show(
-					L"Pardon me. This program is too stupid\nto glean your desire from such\nwonderfully crafted data. Please try\nsomething else.",
-					L"Can't understand pasted data",
+					L"Some bad thing happened.",
+					L"Lame error handler",
 					System::Windows::Forms::MessageBoxButtons::OK);
-				return;
 			}
-
-			VoteData^ vd = gcnew VoteData;
-			
-			ArrayList^ songs = gcnew ArrayList;
-			ArrayList^ entrants = gcnew ArrayList;
-			get_current_songs_entrants(songs, entrants);
-
-			if (voter != nullptr)
-			{
-				vd->votingby = voter;
-
-				for each (System::Windows::Forms::ListViewItem^ lvi in this->entriesList->Items)
-				{
-					if (lvi == this->_empty_item)
-					{
-						continue;
-					}
-
-					CompoEntry^ ce = (CompoEntry^)(lvi->Tag);
-					
-					// !ce->voted is the same as checking if the song is in the vote list
-					// (or contained in the "entrants" list returned by get_current_song_entrants)
-					// ...
-					// but i don't trust it because it is intended for user-end
-					//if (!ce->voted && ce->composer == voter)
-					if (entrants->Contains(voter) && ce->composer == voter)
-					{
-						vd->votingfor = voter;
-						break;
-					}
-				}
-			}
-
-			for each (String^ vote in votetokens)
-			{
-				int lowestlscore = -1;
-				String ^result = nullptr;
-
-				for each (System::Windows::Forms::ListViewItem^ lvi in this->entriesList->Items)
-				{
-					if (lvi == this->_empty_item)
-					{
-						continue;
-					}
-
-					CompoEntry^ ce = (CompoEntry^)(lvi->Tag);
-
-					if (vd->votes->Contains(ce->filename))
-					{
-						// already-found results are not eligible to be found again!
-						continue;
-					}
-
-					int lscore = this->levenshtein(System::IO::Path::GetFileNameWithoutExtension(ce->filename), vote);
-					if (lscore < this->leven_threshold && (lowestlscore == -1 || lscore < lowestlscore))
-					{
-						lowestlscore = lscore;
-						result = ce->filename;
-					}
-				}
-
-				if (result != nullptr)
-				{
-					vd->votes->Add(result);
-				}
-				
-			}
-
-			this->add_voter(vd);
-
-			/*System::Windows::Forms::MessageBox::Show(
-				//L"...", // String::Join("\n", votetokens)
-				voter,
-				L"things",
-				System::Windows::Forms::MessageBoxButtons::OK);
-				*/
 			
 		}
 		
@@ -1671,6 +1689,10 @@ namespace lazyslash {
 				System::Windows::Forms::Clipboard::SetData(System::Windows::Forms::DataFormats::Text, newclipdata);
 			}
 
+		}
+		private: System::Void votesMenuStrip_Opening(System::Object^  sender, System::ComponentModel::CancelEventArgs^  e)
+		{
+			this->votesMenuStrip->Items[1]->Enabled = System::Windows::Forms::Clipboard::ContainsText();
 		}
 };
 
