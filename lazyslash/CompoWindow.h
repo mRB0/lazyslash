@@ -1,5 +1,9 @@
 #pragma once
 
+/*
+ * $Id$
+ */
+
 #include "TrackerMod.h"
 #include "ListViewItemComparer.h"
 #include "CompoEntry.h"

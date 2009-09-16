@@ -1,5 +1,9 @@
 #pragma once
 
+/*
+ * $Id$
+ */
+
 #include "VoteData.h"
 #include "CompoEntry.h"
 
