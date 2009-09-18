@@ -41,8 +41,6 @@ namespace lazyslash {
 			InitializeComponent();
 
 			this->open_new();
-
-
 		}
 
 		public: int levenshtein(String^ s, String^ t)
@@ -799,16 +797,19 @@ namespace lazyslash {
 		private: System::Void createzipButton_Click(System::Object^  sender, System::EventArgs^  e)
 		{
 			System::Windows::Forms::SaveFileDialog^ sfd = gcnew System::Windows::Forms::SaveFileDialog;
-			sfd->Filter = "zip files (*.zip)|*.zip|All files (*.*)|*.*";
-			sfd->FilterIndex = 0;
+			sfd->Filter = "7zip files (*.7z)|*.7z|zip files (*.zip)|*.zip|All files (*.*)|*.*";
+			sfd->FilterIndex = 1;
 			//sfd->RestoreDirectory = true;
+			//sfd->AddExtension = true;
 
 			DateTime^ now = DateTime::Now;
-			sfd->FileName = now->ToString("yyyy-MM-dd\"_votepack.zip\"");
+			sfd->FileName = now->ToString("yyyy-MM-dd\"_votepack\"");
+			sfd->DefaultExt = "7z";
 
 			if (sfd->ShowDialog() == System::Windows::Forms::DialogResult::OK)
 			{
 				
+				/*
 				Ionic::Zip::ZipFile^ zf = gcnew Ionic::Zip::ZipFile;
 	
 				
@@ -824,8 +825,88 @@ namespace lazyslash {
 				zf->Save(sfd->FileName);
 	
 				delete zf;
+				*/
 
-				this->zipfilePath = sfd->FileName;
+				String ^filespecs = L"";
+
+				if (sfd->FilterIndex == 1)
+				{
+					filespecs += L"-t7z ";
+				}
+				else if (sfd->FilterIndex == 2)
+				{
+					filespecs += L"-tzip ";
+				}
+
+				for each (System::Windows::Forms::ListViewItem^ additem in this->entriesList->Items)
+				{
+					if (additem != this->_empty_item)
+					{
+						filespecs += L"\"" +
+							((CompoEntry^)additem->Tag)->filespec->Replace('\\', '/') +
+							L"\" ";
+						
+					}
+				}
+
+				try
+				{
+					System::IO::File::Delete(sfd->FileName);
+
+					String^ exe7z = System::IO::Path::Combine(System::IO::Path::GetDirectoryName(Application::ExecutablePath), "7z.exe");
+
+					Process^ zipproc = gcnew Process();
+					zipproc->StartInfo->CreateNoWindow = true;
+					zipproc->StartInfo->UseShellExecute = false;
+					//zipproc->StandardOutput = gcnew System::IO::StreamWriter(L"C:\temp\7zout.txt");
+					zipproc->StartInfo->RedirectStandardOutput = true;
+					zipproc->StartInfo->FileName = exe7z;
+					zipproc->StartInfo->Arguments = L"a \"" +
+						sfd->FileName->Replace('\\', '/') +
+						L"\" " +
+						filespecs;
+
+					zipproc->Start();
+
+					String^ stdout = zipproc->StandardOutput->ReadToEnd();
+					zipproc->WaitForExit();
+
+					if (zipproc->ExitCode != 0)
+					{
+						ResultsDisplay rd(stdout, L"7zip error output");
+						rd.ShowDialog();
+					}
+					
+					this->zipfilePath = sfd->FileName;
+				}
+				catch(System::ComponentModel::Win32Exception^ w32e)
+				{
+					System::Windows::Forms::MessageBox::Show(
+						L"An error occurred executing 7z.exe, so compress your files manually.\n\n" +
+						L"The error was: " +
+						w32e->Message,
+						L"Sorry :(",
+						System::Windows::Forms::MessageBoxButtons::OK);
+				}
+				catch(System::Exception^ e)
+				{
+					System::Windows::Forms::MessageBox::Show(
+						L"Something weird happened. Compress your files manually.\n\n" +
+						L"The error was: " +
+						e->Message,
+						L"Sorry :(",
+						System::Windows::Forms::MessageBoxButtons::OK);
+				}
+				catch(...)
+				{
+					System::Windows::Forms::MessageBox::Show(
+						L"Something REALLY weird happened.\n" +
+						L"There's not even an exception handler to deal with it.",
+						L"Sorry :(",
+						System::Windows::Forms::MessageBoxButtons::OK);
+				}
+
+
 			}
 
 			this->check_zip_button();

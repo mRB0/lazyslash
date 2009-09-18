@@ -92,6 +92,8 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
+				Description="Copying 7z.exe"
+				CommandLine="copy 7z.exe ..\Debug"
 			/>
 		</Configuration>
 		<Configuration
@@ -166,6 +168,8 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
+				Description="Copying 7z.exe"
+				CommandLine="copy 7z.exe ..\Release"
 			/>
 		</Configuration>
 	</Configurations>
@@ -193,11 +197,6 @@
 		<AssemblyReference
 			RelativePath="System.XML.dll"
 			AssemblyName="System.Xml, Version=2.0.0.0, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL"
-			MinFrameworkVersion="131072"
-		/>
-		<AssemblyReference
-			RelativePath="..\..\DotNetZip\DotNetZip-v1.8\Release\Ionic.Zip.dll"
-			AssemblyName="Ionic.Zip, Version=1.8.4.22, PublicKeyToken=edbe51ad942a3f5c, processorArchitecture=MSIL"
 			MinFrameworkVersion="131072"
 		/>
 	</References>
