@@ -1067,6 +1067,7 @@ namespace lazyslash {
 				ArrayList^ songs = gcnew ArrayList;
 				ArrayList^ entrants = gcnew ArrayList;
 				get_current_songs_entrants(songs, entrants);
+				CompoEntry ^author_entry = nullptr;
 	
 				if (voter != nullptr)
 				{
@@ -1088,6 +1089,7 @@ namespace lazyslash {
 						//if (!ce->voted && ce->composer == voter)
 						if (entrants->Contains(voter) && ce->composer == voter)
 						{
+							author_entry = ce;
 							vd->votingfor = voter;
 							break;
 						}
@@ -1128,13 +1130,22 @@ namespace lazyslash {
 					}
 					
 				}
+
+				// if there is only one entry left in songs that isn't in vd->votes,
+				// and it belongs to the current author (CompoEntry^ author_entry when not
+				// nullptr), then move it into the list.
+				if ((author_entry != nullptr) && (vd->votes->Count+1 == songs->Count) && (!vd->votes->Contains(author_entry->filename)))
+				{
+					vd->votes->Add(author_entry->filename);
+				}
 	
 				this->add_voter(vd);
 			}
-			catch(...)
+			catch(System::Exception^ exc)
 			{
 				System::Windows::Forms::MessageBox::Show(
-					L"Some bad thing happened.",
+					L"Some bad thing happened.\n\n" +
+					exc->ToString(),
 					L"Lame error handler",
 					System::Windows::Forms::MessageBoxButtons::OK);
 			}
