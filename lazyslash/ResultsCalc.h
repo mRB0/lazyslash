@@ -186,7 +186,9 @@ private:
 					ce->composer +
 					" <=- with " +
 					scorestr +
-					"pts ]\n";
+					" point" +
+					((ce->score == 1) ? "" : "s") +
+					" ]\n";
 			}
 			results += "--\n";
 			
