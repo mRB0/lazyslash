@@ -409,6 +409,7 @@ namespace lazyslash {
 			// 
 			// exportTxtLabel
 			// 
+			this->exportTxtLabel->Anchor = static_cast<System::Windows::Forms::AnchorStyles>((System::Windows::Forms::AnchorStyles::Bottom | System::Windows::Forms::AnchorStyles::Left));
 			this->exportTxtLabel->AutoSize = true;
 			this->exportTxtLabel->Enabled = false;
 			this->exportTxtLabel->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 8.25F, System::Drawing::FontStyle::Underline, 
