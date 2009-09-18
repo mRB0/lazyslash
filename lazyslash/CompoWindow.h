@@ -121,6 +121,8 @@ namespace lazyslash {
 
 	private: System::Windows::Forms::ToolStripSeparator^  toolStripSeparator2;
 	private: System::Windows::Forms::ToolStripMenuItem^  copyToolStripMenuItem;
+
+
 			 int sort_col;
 
 		/// <summary>
@@ -264,7 +266,7 @@ namespace lazyslash {
 			this->zipErrorLabel->Anchor = static_cast<System::Windows::Forms::AnchorStyles>(((System::Windows::Forms::AnchorStyles::Bottom | System::Windows::Forms::AnchorStyles::Left) 
 				| System::Windows::Forms::AnchorStyles::Right));
 			this->zipErrorLabel->AutoSize = true;
-			this->zipErrorLabel->Location = System::Drawing::Point(155, 262);
+			this->zipErrorLabel->Location = System::Drawing::Point(126, 262);
 			this->zipErrorLabel->Name = L"zipErrorLabel";
 			this->zipErrorLabel->Size = System::Drawing::Size(85, 13);
 			this->zipErrorLabel->TabIndex = 5;
@@ -276,9 +278,9 @@ namespace lazyslash {
 			this->createzipButton->Anchor = static_cast<System::Windows::Forms::AnchorStyles>((System::Windows::Forms::AnchorStyles::Bottom | System::Windows::Forms::AnchorStyles::Left));
 			this->createzipButton->Location = System::Drawing::Point(6, 257);
 			this->createzipButton->Name = L"createzipButton";
-			this->createzipButton->Size = System::Drawing::Size(143, 23);
+			this->createzipButton->Size = System::Drawing::Size(114, 23);
 			this->createzipButton->TabIndex = 4;
-			this->createzipButton->Text = L"Create votepack .&ZIP";
+			this->createzipButton->Text = L"Create &votepack";
 			this->createzipButton->UseVisualStyleBackColor = true;
 			this->createzipButton->Click += gcnew System::EventHandler(this, &CompoWindow::createzipButton_Click);
 			// 
@@ -463,7 +465,7 @@ namespace lazyslash {
 				this->pasteToolStripMenuItem});
 			this->votesMenuStrip->Name = L"votesMenuStrip";
 			this->votesMenuStrip->RenderMode = System::Windows::Forms::ToolStripRenderMode::System;
-			this->votesMenuStrip->Size = System::Drawing::Size(168, 70);
+			this->votesMenuStrip->Size = System::Drawing::Size(168, 48);
 			this->votesMenuStrip->Opening += gcnew System::ComponentModel::CancelEventHandler(this, &CompoWindow::votesMenuStrip_Opening);
 			// 
 			// addToolStripMenuItem
@@ -527,6 +529,7 @@ namespace lazyslash {
 			// 
 			// fileToolStripMenuItem
 			// 
+			this->fileToolStripMenuItem->DisplayStyle = System::Windows::Forms::ToolStripItemDisplayStyle::Text;
 			this->fileToolStripMenuItem->DropDownItems->AddRange(gcnew cli::array< System::Windows::Forms::ToolStripItem^  >(6) {this->newToolStripMenuItem, 
 				this->openToolStripMenuItem, this->saveToolStripMenuItem, this->saveAsToolStripMenuItem, this->toolStripSeparator2, this->exitToolStripMenuItem});
 			this->fileToolStripMenuItem->Name = L"fileToolStripMenuItem";
@@ -535,6 +538,7 @@ namespace lazyslash {
 			// 
 			// newToolStripMenuItem
 			// 
+			this->newToolStripMenuItem->DisplayStyle = System::Windows::Forms::ToolStripItemDisplayStyle::Text;
 			this->newToolStripMenuItem->Name = L"newToolStripMenuItem";
 			this->newToolStripMenuItem->ShortcutKeys = static_cast<System::Windows::Forms::Keys>((System::Windows::Forms::Keys::Control | System::Windows::Forms::Keys::N));
 			this->newToolStripMenuItem->Size = System::Drawing::Size(140, 22);
@@ -543,6 +547,7 @@ namespace lazyslash {
 			// 
 			// openToolStripMenuItem
 			// 
+			this->openToolStripMenuItem->DisplayStyle = System::Windows::Forms::ToolStripItemDisplayStyle::Text;
 			this->openToolStripMenuItem->Name = L"openToolStripMenuItem";
 			this->openToolStripMenuItem->ShortcutKeys = static_cast<System::Windows::Forms::Keys>((System::Windows::Forms::Keys::Control | System::Windows::Forms::Keys::O));
 			this->openToolStripMenuItem->Size = System::Drawing::Size(140, 22);
@@ -551,6 +556,7 @@ namespace lazyslash {
 			// 
 			// saveToolStripMenuItem
 			// 
+			this->saveToolStripMenuItem->DisplayStyle = System::Windows::Forms::ToolStripItemDisplayStyle::Text;
 			this->saveToolStripMenuItem->Name = L"saveToolStripMenuItem";
 			this->saveToolStripMenuItem->ShortcutKeys = static_cast<System::Windows::Forms::Keys>((System::Windows::Forms::Keys::Control | System::Windows::Forms::Keys::S));
 			this->saveToolStripMenuItem->Size = System::Drawing::Size(140, 22);
@@ -559,6 +565,7 @@ namespace lazyslash {
 			// 
 			// saveAsToolStripMenuItem
 			// 
+			this->saveAsToolStripMenuItem->DisplayStyle = System::Windows::Forms::ToolStripItemDisplayStyle::Text;
 			this->saveAsToolStripMenuItem->Name = L"saveAsToolStripMenuItem";
 			this->saveAsToolStripMenuItem->Size = System::Drawing::Size(140, 22);
 			this->saveAsToolStripMenuItem->Text = L"Save &As...";
@@ -571,6 +578,7 @@ namespace lazyslash {
 			// 
 			// exitToolStripMenuItem
 			// 
+			this->exitToolStripMenuItem->DisplayStyle = System::Windows::Forms::ToolStripItemDisplayStyle::Text;
 			this->exitToolStripMenuItem->Name = L"exitToolStripMenuItem";
 			this->exitToolStripMenuItem->ShortcutKeys = static_cast<System::Windows::Forms::Keys>((System::Windows::Forms::Keys::Alt | System::Windows::Forms::Keys::F4));
 			this->exitToolStripMenuItem->Size = System::Drawing::Size(140, 22);
@@ -873,7 +881,7 @@ namespace lazyslash {
 
 					if (zipproc->ExitCode != 0)
 					{
-						ResultsDisplay rd(stdout, L"7zip error output");
+						ResultsDisplay rd(stdout, L"7zip output");
 						rd.ShowDialog();
 					}
 					
@@ -1036,7 +1044,7 @@ namespace lazyslash {
 						voter = m_nick->Groups[1]->Value;
 						start_votelook = m_nick->Index+m_nick->Length;
 					}
-					System::Text::RegularExpressions::Regex re_songs(L"[^a-zA-Z0-9_]*([0-9][0-9]?[\.:,;\-]?[^a-zA-Z0-9_]*)?([a-zA-Z0-9_\.]+)", System::Text::RegularExpressions::RegexOptions::IgnoreCase);
+					System::Text::RegularExpressions::Regex re_songs(L"[^a-zA-Z0-9_]*([0-9][0-9]?[\.:,;\-]?[<>:\"/\\\|\?\* ]*)?([^<>:\"/\\\|\?\* ]+)", System::Text::RegularExpressions::RegexOptions::IgnoreCase);
 					System::Text::RegularExpressions::Match^ m_songs = re_songs.Match(line, start_votelook);
 					
 					while (m_songs->Success)
