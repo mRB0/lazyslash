@@ -718,6 +718,8 @@ namespace lazyslash {
 			
 			this->entriesList->Items->Remove(this->_empty_item);
 
+			ListViewItem^ new_item;
+
 			for each (String^ file in files)
 			{
 				String^ filename = System::IO::Path::GetFileName(file);
@@ -725,12 +727,31 @@ namespace lazyslash {
 				String^ songtitle = TrackerMod::GetSongTitle(file)->TrimEnd(nullptr);
 				//int songlen = songtitle->Length;
 				
-				ListViewItem^ new_item = gcnew ListViewItem(gcnew array<String^>{"", "", filename, songtitle});
+				new_item = gcnew ListViewItem(gcnew array<String^>{"", "", filename, songtitle});
 				new_item->Tag = gcnew CompoEntry(file, songtitle);
 
 				this->entriesList->Items->Add(new_item);
 				this->match_entrylist_to_entry(new_item);
 			}
+
+			if (files->Length == 1)
+			{
+				// go directly to edit item if there is only one thing dropped
+
+				ArrayList^ songs = gcnew ArrayList;
+				ArrayList^ entrants = gcnew ArrayList;
+				get_current_songs_entrants(songs, entrants);
+
+				EntryEditor ee((CompoEntry^)(new_item->Tag), songs);
+				ee.StartPosition = System::Windows::Forms::FormStartPosition::CenterParent;
+				ee.ShowDialog();
+
+				// make list entry match CompoEntry tag
+				this->match_entrylist_to_entry(new_item);
+				this->entriesList->Sort();
+
+			}
+
 
 			this->entriesList->Items->Add(_empty_item);
 			this->entriesList->Sort();
