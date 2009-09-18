@@ -20,7 +20,7 @@ namespace lazyslash {
 	public ref class compoversion
 	{
 	public:
-		static String^ version = L"0.1.4";
+		static String^ version = L"0.1.5";
 		static String^ svnrevision = SVN_REVSTR;
 		static String^ svnrevdate = SVN_REVDATE;
 
