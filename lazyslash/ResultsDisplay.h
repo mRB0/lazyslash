@@ -33,6 +33,14 @@ namespace lazyslash {
 			this->resultsBox->Text = resultsText;
 			this->CancelButton = this->closeButton;
 		}
+		ResultsDisplay(String^ resultsText, String^ windowtitle)
+		{
+			InitializeComponent();
+			
+			this->resultsBox->Text = resultsText;
+			this->CancelButton = this->closeButton;
+			this->Text = windowtitle;
+		}
 
 	protected:
 		/// <summary>
