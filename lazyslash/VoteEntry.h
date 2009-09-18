@@ -33,6 +33,8 @@ namespace lazyslash {
 		{
 			InitializeComponent();
 
+			this->cb_dragging = nullptr;
+
 			this->vd = vd;
 			this->entrants = entrants;
 			
@@ -43,6 +45,7 @@ namespace lazyslash {
 
 			this->availBox->FullRowSelect = true;
 			this->chosenBox->FullRowSelect = true;
+			this->chosenBox->InsertionMark->Color = Color::Green;
 			
 			this->voterCombo->DropDownStyle = System::Windows::Forms::ComboBoxStyle::DropDownList;
 			
@@ -239,6 +242,7 @@ namespace lazyslash {
 			// 
 			// chosenBox
 			// 
+			this->chosenBox->AllowDrop = true;
 			this->chosenBox->Anchor = static_cast<System::Windows::Forms::AnchorStyles>(((System::Windows::Forms::AnchorStyles::Top | System::Windows::Forms::AnchorStyles::Bottom) 
 				| System::Windows::Forms::AnchorStyles::Right));
 			this->chosenBox->Columns->AddRange(gcnew cli::array< System::Windows::Forms::ColumnHeader^  >(2) {this->columnHeader3, this->columnHeader4});
@@ -253,6 +257,11 @@ namespace lazyslash {
 			this->chosenBox->DoubleClick += gcnew System::EventHandler(this, &VoteEntry::chosenBox_DoubleClick);
 			this->chosenBox->Leave += gcnew System::EventHandler(this, &VoteEntry::chosenBox_Leave);
 			this->chosenBox->Enter += gcnew System::EventHandler(this, &VoteEntry::chosenBox_Enter);
+			this->chosenBox->DragDrop += gcnew System::Windows::Forms::DragEventHandler(this, &VoteEntry::chosenBox_DragDrop);
+			this->chosenBox->DragEnter += gcnew System::Windows::Forms::DragEventHandler(this, &VoteEntry::chosenBox_DragEnter);
+			this->chosenBox->DragLeave += gcnew System::EventHandler(this, &VoteEntry::chosenBox_DragLeave);
+			this->chosenBox->ItemDrag += gcnew System::Windows::Forms::ItemDragEventHandler(this, &VoteEntry::chosenBox_ItemDrag);
+			this->chosenBox->DragOver += gcnew System::Windows::Forms::DragEventHandler(this, &VoteEntry::chosenBox_DragOver);
 			// 
 			// columnHeader3
 			// 
@@ -506,6 +515,92 @@ namespace lazyslash {
 		private: System::Void chosenBox_Leave(System::Object^  sender, System::EventArgs^  e) 
 		{
 			this->AcceptButton = this->okButton;
+		}
+
+		System::Windows::Forms::ListViewItem^ cb_dragging;
+		int cb_draginsertindex;
+
+		private: System::Void chosenBox_ItemDrag(System::Object^  sender, System::Windows::Forms::ItemDragEventArgs^  e)
+		{
+			cb_draginsertindex = -1;
+			cb_dragging = (System::Windows::Forms::ListViewItem^)(e->Item);
+			this->DoDragDrop(L"chosenbox_drag", DragDropEffects::Move);
+		}
+		private: System::Void chosenBox_DragEnter(System::Object^  sender, System::Windows::Forms::DragEventArgs^  e)
+		{
+			if ((e->Data->GetDataPresent(DataFormats::Text) && e->Data->GetData(DataFormats::Text) == L"chosenbox_drag" && cb_dragging != nullptr))
+			{
+				e->Effect = DragDropEffects::Move;
+				//e->Effect = e->AllowedEffect;
+			}
+			else
+			{
+				e->Effect = DragDropEffects::None;
+			}			
+			
+		}
+		private: System::Void chosenBox_DragDrop(System::Object^  sender, System::Windows::Forms::DragEventArgs^  e)
+		{
+			if (e->Data->GetDataPresent(DataFormats::Text) && e->Data->GetData(DataFormats::Text) == L"chosenbox_drag" && cb_dragging != nullptr)
+			{
+				//String^ ploble = this->cb_dragging->SubItems[0]->Text;
+				// Retrieve the index of the insertion mark;
+				//int targetIndex = chosenBox->InsertionMark->Index;
+
+				// If the insertion mark is not visible, exit the method.
+				if ( cb_draginsertindex == -1 )
+				{
+					cb_dragging = nullptr;
+					return;
+				}
+
+				chosenBox->Items->Insert( cb_draginsertindex, (System::Windows::Forms::ListViewItem^)(cb_dragging->Clone()) );
+
+				// Remove the original copy of the dragged item.
+				chosenBox->Items->Remove( cb_dragging );
+				cb_dragging = nullptr;
+
+				this->check_completed();
+			}
+		}
+		private: System::Void chosenBox_DragOver(System::Object^  sender, System::Windows::Forms::DragEventArgs^  e)
+		{
+			if (e->Data->GetDataPresent(DataFormats::Text) && e->Data->GetData(DataFormats::Text) == L"chosenbox_drag" && cb_dragging != nullptr)
+			{
+				// Retrieve the client coordinates of the mouse pointer.
+				Point targetPoint = chosenBox->PointToClient( Point(e->X,e->Y) );
+
+				// Retrieve the index of the item closest to the mouse pointer.
+				//cb_draginsertindex = chosenBox->GetItemAt(e->X, e->Y)->Index;
+				cb_draginsertindex = chosenBox->GetItemAt(targetPoint.X, targetPoint.Y)->Index;
+
+				// Confirm that the mouse pointer is not over the dragged item.
+				if ( cb_draginsertindex > -1 )
+				{
+					// Determine whether the mouse pointer is to the left or
+					// the right of the midpoint of the closest item and set
+					// the InsertionMark.AppearsAfterItem property accordingly.
+					Rectangle^ itemBounds = chosenBox->GetItemRect( cb_draginsertindex );
+					if ( targetPoint.Y > itemBounds->Top + (itemBounds->Height / 2) )
+					{
+						cb_draginsertindex++;
+						// after
+						//chosenBox->InsertionMark->AppearsAfterItem = true;
+					}
+					else
+					{
+						// before
+						//chosenBox->InsertionMark->AppearsAfterItem = false;
+					}
+				}
+
+				//cb_draginsertindex = targetIndex;
+
+			}
+		}
+		private: System::Void chosenBox_DragLeave(System::Object^  sender, System::EventArgs^  e)
+		{
+			//chosenBox->InsertionMark->Index = -1;
 		}
 };
 }
