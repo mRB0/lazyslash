@@ -3,6 +3,10 @@ Microsoft Visual Studio Solution File, Format Version 10.00
 # Visual C++ Express 2008
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lazyslash", "lazyslash\lazyslash.vcproj", "{D781B834-B3F1-4A8A-84A2-82340A172F05}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "VotePlugin", "VotePlugin\VotePlugin.vcproj", "{04C5ADF2-1AD2-4D15-B2BB-AA1ABE975F72}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "vp_lazyslash", "vp_lazyslash\vp_lazyslash.vcproj", "{BFE479D2-220C-458D-8A87-55DCB48B6399}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -13,6 +17,14 @@ Global
 		{D781B834-B3F1-4A8A-84A2-82340A172F05}.Debug|Win32.Build.0 = Debug|Win32
 		{D781B834-B3F1-4A8A-84A2-82340A172F05}.Release|Win32.ActiveCfg = Release|Win32
 		{D781B834-B3F1-4A8A-84A2-82340A172F05}.Release|Win32.Build.0 = Release|Win32
+		{04C5ADF2-1AD2-4D15-B2BB-AA1ABE975F72}.Debug|Win32.ActiveCfg = Debug|Win32
+		{04C5ADF2-1AD2-4D15-B2BB-AA1ABE975F72}.Debug|Win32.Build.0 = Debug|Win32
+		{04C5ADF2-1AD2-4D15-B2BB-AA1ABE975F72}.Release|Win32.ActiveCfg = Release|Win32
+		{04C5ADF2-1AD2-4D15-B2BB-AA1ABE975F72}.Release|Win32.Build.0 = Release|Win32
+		{BFE479D2-220C-458D-8A87-55DCB48B6399}.Debug|Win32.ActiveCfg = Debug|Win32
+		{BFE479D2-220C-458D-8A87-55DCB48B6399}.Debug|Win32.Build.0 = Debug|Win32
+		{BFE479D2-220C-458D-8A87-55DCB48B6399}.Release|Win32.ActiveCfg = Release|Win32
+		{BFE479D2-220C-458D-8A87-55DCB48B6399}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
