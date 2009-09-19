@@ -174,10 +174,9 @@
 			AssemblyName="System.Xml, Version=2.0.0.0, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL"
 			MinFrameworkVersion="131072"
 		/>
-		<AssemblyReference
-			RelativePath="..\Debug\VotePlugin.dll"
-			AssemblyName="VotePlugin, Version=1.0.3549.17656, processorArchitecture=x86"
-			MinFrameworkVersion="131072"
+		<ProjectReference
+			ReferencedProjectIdentifier="{04C5ADF2-1AD2-4D15-B2BB-AA1ABE975F72}"
+			RelativePathToProject=".\VotePlugin\VotePlugin.vcproj"
 		/>
 	</References>
 	<Files>

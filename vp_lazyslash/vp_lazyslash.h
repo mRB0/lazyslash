@@ -17,7 +17,7 @@ namespace vp_lazyslash {
 
 		property String^ vp_name 
 		{
-			virtual String^ get() { return L"lazyslash"; }
+			virtual String^ get() { return L"lazyparse"; }
 		}
 
 		property String^ vp_author
@@ -27,7 +27,7 @@ namespace vp_lazyslash {
 
 		property String^ vp_version
 		{
-			virtual String^ get() { return L"banana"; }
+			virtual String^ get() { return L"1.0"; }
 		}
 
 		property String^ voter
