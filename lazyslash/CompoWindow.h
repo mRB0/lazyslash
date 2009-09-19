@@ -1077,6 +1077,8 @@ namespace lazyslash {
 				else
 				{
 					VoteParseSelection^ vps = gcnew VoteParseSelection(vote_outputs);
+					vps->StartPosition = System::Windows::Forms::FormStartPosition::CenterParent;
+
 					System::Windows::Forms::DialogResult dr = vps->ShowDialog();
 					if (dr != System::Windows::Forms::DialogResult::OK)
 					{
