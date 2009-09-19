@@ -13,6 +13,7 @@
 #include "ResultsCalc.h"
 #include "ResultsDisplay.h"
 #include "compoversion.h"
+#include "VoteParseSelection.h"
 
 namespace lazyslash {
 
@@ -1018,33 +1019,59 @@ namespace lazyslash {
 
 				for each (String^ plugin_path in plugins)
 				{
-					// call each plugin
+					try
+					{
+						// call each plugin
 
-					String^ plugin_name = System::IO::Path::GetFileNameWithoutExtension(plugin_path);
+						String^ plugin_name = System::IO::Path::GetFileNameWithoutExtension(plugin_path);
 
-					VotePlugin::IVotePlugin^ ivp;
+						VotePlugin::IVotePlugin^ ivp;
 
 
-					System::Reflection::Assembly^ assem = System::Reflection::Assembly::Load(plugin_name);
-					System::Type^ voteplug = assem->GetType(plugin_name + "." + plugin_name);
-					ivp = (VotePlugin::IVotePlugin^)(Activator::CreateInstance(voteplug));
+						System::Reflection::Assembly^ assem = System::Reflection::Assembly::Load(plugin_name);
+						System::Type^ voteplug = assem->GetType(plugin_name + "." + plugin_name);
+						ivp = (VotePlugin::IVotePlugin^)(Activator::CreateInstance(voteplug));
 
-					ivp->set_entries(vp_entries);
-					ivp->set_not_voted(vp_not_voted);
+						ivp->set_entries(vp_entries);
+						ivp->set_not_voted(vp_not_voted);
 
-					ArrayList^ vote_output = ivp->parse_votes(vp_pastedata);
+						ArrayList^ vote_output = ivp->parse_votes(vp_pastedata);
 
-					// post-plugin processing
+						// post-plugin processing
 
-					vote_outputs->Add(gcnew array<Object^> { ivp, vote_output } );
+						vote_outputs->Add(gcnew array<Object^> { ivp, vote_output } );
+					}
+					catch(VotePlugin::VoteParseException^ vpe)
+					{
+						vote_outputs->Add(gcnew array<Object^> { nullptr, vpe->Message } );
+					}
+					catch(System::Exception^ exc)
+					{
+						System::Windows::Forms::MessageBox::Show(
+							L"Some bad thing happened while executing " +
+							plugin_path +
+							L":\n\n" +
+							exc->ToString(),
+							L"Slightly less lame error handler",
+							System::Windows::Forms::MessageBoxButtons::OK);
+					}
 
 
 				}
 
+				// TODO: Ask user which parser results to use
+				(gcnew VoteParseSelection)->ShowDialog();
+
 				int voteparse_idx = 0;
 
-				ArrayList^ vote_output = (ArrayList^)( ((array<Object^>^)(vote_outputs[voteparse_idx]))[1] );
 				VotePlugin::IVotePlugin^ ivp = (VotePlugin::IVotePlugin^)( ((array<Object^>^)(vote_outputs[voteparse_idx]))[0] );
+
+				if (ivp == nullptr)
+				{
+					return;
+				}
+
+				ArrayList^ vote_output = (ArrayList^)( ((array<Object^>^)(vote_outputs[voteparse_idx]))[1] );
 
 				CompoEntry ^author_entry = nullptr;
 				VoteData^ vd = gcnew VoteData;

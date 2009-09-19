@@ -201,7 +201,7 @@
 		/>
 		<AssemblyReference
 			RelativePath="..\Debug\VotePlugin.dll"
-			AssemblyName="VotePlugin, Version=1.0.3549.21162, processorArchitecture=x86"
+			AssemblyName="VotePlugin, Version=1.0.3549.23159, processorArchitecture=x86"
 			MinFrameworkVersion="131072"
 		/>
 	</References>
@@ -273,6 +273,10 @@
 			</File>
 			<File
 				RelativePath=".\VoteEntry.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\VoteParseSelection.cpp"
 				>
 			</File>
 		</Filter>
@@ -357,6 +361,15 @@
 				>
 				<File
 					RelativePath=".\VoteEntry.resx"
+					>
+				</File>
+			</File>
+			<File
+				RelativePath=".\VoteParseSelection.h"
+				FileType="3"
+				>
+				<File
+					RelativePath=".\VoteParseSelection.resx"
 					>
 				</File>
 			</File>
