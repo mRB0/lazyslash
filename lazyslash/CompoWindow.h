@@ -43,63 +43,8 @@ namespace lazyslash {
 			this->open_new();
 		}
 
-		public: int levenshtein(String^ s, String^ t)
-		{
-			s = s->ToLower();
-			t = t->ToLower();
-
-			// d is a table with m+1 rows and n+1 columns
-			array<int,2>^ d = gcnew array<int,2>(s->Length+1, t->Length+1);
-
-			int i, j;
-
-			for (i=0; i < s->Length+1; i++)
-			{
-				d[i, 0] = i; // deletion
-			}
-			for (j=0; j < t->Length+1; j++)
-			{
-				d[0, j] = j; // insertion
-			}
-
-			for (j=1; j < t->Length+1; j++)
-			{
-				for (i=1; i < s->Length+1; i++)
-				{
-					
-					if (s[i-1] == t[j-1])
-					{
-						d[i, j] = d[i-1, j-1];
-					}
-					else
-					{
-						int del = d[i-1, j] + 1;   // deletion
-						int ins = d[i, j-1] + 1;   // insertion
-						int sub = d[i-1, j-1] + 1; // substitution
-
-						if (del < ins && del < sub)
-						{
-							d[i, j] = del;
-						}
-						else if (ins < sub)
-						{
-							d[i, j] = ins;
-						}
-						else
-						{
-							d[i, j] = sub;
-						}
-					}
-				
-				}
-			}
-
-			return d[s->Length, t->Length];
-		}
 
 	protected:
-
-		static int leven_threshold = 4;
 
 		String^ zipfilePath;
 		String^ txtfilePath;
@@ -1050,107 +995,84 @@ namespace lazyslash {
 					return;
 				}
 
-				array<String^>^ pastedata = pastedstr->Replace(L"\r", L"")->Split(L'\n');
-				String^ voter = nullptr;
-				ArrayList^ votetokens = gcnew ArrayList;
+				//array<String^>^ pastedata = pastedstr->Replace(L"\r", L"")->Split(L'\n');
 				
-				for each (String^ line in pastedata)
+				ArrayList^ vp_pastedata = gcnew ArrayList(pastedstr->Replace(L"\r", L"")->Split(L'\n'));
+
+				// build entries list for VotePlugins
+				ArrayList^ songs = gcnew ArrayList;
+				ArrayList^ vp_not_voted = gcnew ArrayList;
+				get_current_songs_entrants(songs, vp_not_voted);
+
+				ArrayList^ vp_entries = gcnew ArrayList;
+				
+				for each (CompoEntry^ ce in songs)
 				{
-		
-					System::Text::RegularExpressions::Regex re_nick(L"[^<]*<([^>]+)>");
-					System::Text::RegularExpressions::Match^ m_nick = re_nick.Match(line);
-					int start_votelook = 0;
-	
-					if (m_nick->Success)
-					{
-						voter = m_nick->Groups[1]->Value;
-						start_votelook = m_nick->Index+m_nick->Length;
-					}
-					System::Text::RegularExpressions::Regex re_songs(L"[^a-zA-Z0-9_]*([0-9][0-9]?[\.:,;\-]?[<>:\"/\\\|\?\* ]*)?([^<>:\"/\\\|\?\* ]+)", System::Text::RegularExpressions::RegexOptions::IgnoreCase);
-					System::Text::RegularExpressions::Match^ m_songs = re_songs.Match(line, start_votelook);
-					
-					while (m_songs->Success)
-					{
-						votetokens->Add(System::IO::Path::GetFileNameWithoutExtension(m_songs->Groups[2]->Value));
-						m_songs = m_songs->NextMatch();
-					}
+					VotePlugin::Entry^ vpe = gcnew VotePlugin::Entry(ce->composer, ce->filename, ce->songtitle);
+					vp_entries->Add(vpe);
 				}
-				if (votetokens->Count == 0)
+				
+				array<String^>^ plugins = System::IO::Directory::GetFiles(System::IO::Path::GetDirectoryName(Application::ExecutablePath), L"vp_*.dll");
+
+				ArrayList^ vote_outputs = gcnew ArrayList;
+
+				for each (String^ plugin_path in plugins)
 				{
-					System::Windows::Forms::MessageBox::Show(
-						L"Pardon me. This program is too stupid\nto glean your desire from such\nwonderfully crafted data. Please try\nsomething else.",
-						L"Can't understand pasted data",
-						System::Windows::Forms::MessageBoxButtons::OK);
-					return;
+					// call each plugin
+
+					String^ plugin_name = System::IO::Path::GetFileNameWithoutExtension(plugin_path);
+
+					VotePlugin::IVotePlugin^ ivp;
+
+
+					System::Reflection::Assembly^ assem = System::Reflection::Assembly::Load(plugin_name);
+					System::Type^ voteplug = assem->GetType(plugin_name + "." + plugin_name);
+					ivp = (VotePlugin::IVotePlugin^)(Activator::CreateInstance(voteplug));
+
+					ivp->set_entries(vp_entries);
+					ivp->set_not_voted(vp_not_voted);
+
+					ArrayList^ vote_output = ivp->parse_votes(vp_pastedata);
+
+					// post-plugin processing
+
+					vote_outputs->Add(gcnew array<Object^> { ivp, vote_output } );
+
+
 				}
 
-				VoteData^ vd = gcnew VoteData;
-				
-				ArrayList^ songs = gcnew ArrayList;
-				ArrayList^ entrants = gcnew ArrayList;
-				get_current_songs_entrants(songs, entrants);
+				int voteparse_idx = 0;
+
+				ArrayList^ vote_output = (ArrayList^)( ((array<Object^>^)(vote_outputs[voteparse_idx]))[1] );
+				VotePlugin::IVotePlugin^ ivp = (VotePlugin::IVotePlugin^)( ((array<Object^>^)(vote_outputs[voteparse_idx]))[0] );
+
 				CompoEntry ^author_entry = nullptr;
-	
-				if (voter != nullptr)
+				VoteData^ vd = gcnew VoteData;
+
+				for each (VotePlugin::Entry^ e in vote_output)
 				{
-					vd->votingby = voter;
-	
-					for each (System::Windows::Forms::ListViewItem^ lvi in this->entriesList->Items)
-					{
-						if (lvi == this->_empty_item)
-						{
-							continue;
-						}
-	
-						CompoEntry^ ce = (CompoEntry^)(lvi->Tag);
-						
-						// !ce->voted is the same as checking if the song is in the vote list
-						// (or contained in the "entrants" list returned by get_current_song_entrants)
-						// ...
-						// but i don't trust it because it is intended for user-end
-						//if (!ce->voted && ce->composer == voter)
-						if (entrants->Contains(voter) && ce->composer == voter)
-						{
-							author_entry = ce;
-							vd->votingfor = voter;
-							break;
-						}
-					}
+					vd->votes->Add(e->filename);
 				}
-	
-				for each (String^ vote in votetokens)
+
+
+				// get author_entry using plugin->voter
+				//vd->votingby, vd->votingfor
+				if (ivp->voter != nullptr)
 				{
-					int lowestlscore = -1;
-					String ^result = nullptr;
-	
-					for each (System::Windows::Forms::ListViewItem^ lvi in this->entriesList->Items)
+					vd->votingby = ivp->voter;
+
+					for each (CompoEntry^ ce in songs)
 					{
-						if (lvi == this->_empty_item)
+						if (ce->composer == ivp->voter)
 						{
-							continue;
-						}
-	
-						CompoEntry^ ce = (CompoEntry^)(lvi->Tag);
-	
-						if (vd->votes->Contains(ce->filename))
-						{
-							// already-found results are not eligible to be found again!
-							continue;
-						}
-	
-						int lscore = this->levenshtein(System::IO::Path::GetFileNameWithoutExtension(ce->filename), vote);
-						if (lscore < this->leven_threshold && (lowestlscore == -1 || lscore < lowestlscore))
-						{
-							lowestlscore = lscore;
-							result = ce->filename;
+							if (vp_not_voted->Contains(ivp->voter) && (ce->composer == ivp->voter))
+							{
+								vd->votingfor = ivp->voter;
+								author_entry = ce;
+								break;
+							}
 						}
 					}
-	
-					if (result != nullptr)
-					{
-						vd->votes->Add(result);
-					}
-					
 				}
 
 				// if there is only one entry left in songs that isn't in vd->votes,
