@@ -213,7 +213,14 @@ namespace lazyslash {
 				voterLabel->TabIndex = 2;
 				if (ivp != nullptr)
 				{
-					voterLabel->Text = L"Votes by: " + ivp->voter;
+					if (ivp->voter != nullptr)
+					{
+						voterLabel->Text = L"Votes by: " + ivp->voter;
+					}
+					else
+					{
+						voterLabel->Text = L"Voter unknown.";
+					}
 				}
 				else
 				{
