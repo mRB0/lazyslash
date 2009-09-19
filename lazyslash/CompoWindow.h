@@ -1059,7 +1059,10 @@ namespace lazyslash {
 							L"Slightly less lame error handler",
 							System::Windows::Forms::MessageBoxButtons::OK);
 					}
+					catch(...)
+					{
 
+					}
 
 				}
 
@@ -1377,11 +1380,37 @@ namespace lazyslash {
 		}
 		private: System::Void aboutToolStripMenuItem_Click(System::Object^  sender, System::EventArgs^  e)
 		{
+			array<String^>^ plugins = System::IO::Directory::GetFiles(System::IO::Path::GetDirectoryName(Application::ExecutablePath), L"vp_*.dll");
+			String^ plugin_info = L"";
+
+			for each (String^ plugin_path in plugins)
+			{
+				plugin_info += L"\n";
+				try
+				{
+					String^ plugin_name = System::IO::Path::GetFileNameWithoutExtension(plugin_path);
+		
+					System::Reflection::Assembly^ assem = System::Reflection::Assembly::Load(plugin_name);
+					System::Type^ voteplug = assem->GetType(plugin_name + "." + plugin_name);
+					VotePlugin::IVotePlugin^ ivp = (VotePlugin::IVotePlugin^)(Activator::CreateInstance(voteplug));
+
+					plugin_info += ivp->vp_name + L" " + ivp->vp_version + L" by " + ivp->vp_author;
+				}
+				catch(...)
+				{
+					plugin_info += L"error loading info";
+				}
+				
+				plugin_info += L" (" + System::IO::Path::GetFileName(plugin_path) + L")";
+			}
+
 			System::Windows::Forms::MessageBox::Show(
 				L"lazyslash compomagoo " + compoversion::version + "\ncompo management system\n\n" +
 				L"svn rev " + compoversion::svnrevision +
 				L" (" + compoversion::svnrevdate + L")" +
-				L"\n\n(c) 2009 Mike Burke (mrb)\nmrburke@gmail.com",
+				L"\n\n(c) 2009 Mike Burke (mrb)\nmrburke@gmail.com\n\n" +
+				L"Installed vote parser plugins:\n" +
+				plugin_info,
 				L"Aboot",
 				System::Windows::Forms::MessageBoxButtons::OK);
 		}
