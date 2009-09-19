@@ -3,4 +3,4 @@
 #include "stdafx.h"
 
 #include "VotePlugin.h"
-
+#include "Helpers.h"

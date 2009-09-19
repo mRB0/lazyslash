@@ -28,6 +28,12 @@ namespace VotePlugin {
 		String^ songtitle;
 	};
 
+	public ref class VoteParseException : System::Exception
+	{
+	public:
+		VoteParseException(String^ message) : System::Exception(message) { }
+	};
+
 	public interface class IVotePlugin
 	{
 	public:
@@ -57,6 +63,11 @@ namespace VotePlugin {
 		System::Collections::ArrayList^ parse_votes(System::Collections::ArrayList^ irctext);
 
 		/*
+		 * name of the author who submitted the votes, or nullptr if unknown
+		 */
+		property String^ voter { virtual String^ get(); }
+
+		/*
 		 * vp_name: Name of vote plugin.
 		 * vp_author: Author of vote plugin.
 		 * vp_version: Version of vote plugin.
@@ -64,5 +75,6 @@ namespace VotePlugin {
 		property String^ vp_name { virtual String^ get(); }
 		property String^ vp_author { virtual String^ get(); }
 		property String^ vp_version { virtual String^ get(); }
+
 	};
 }
