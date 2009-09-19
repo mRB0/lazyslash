@@ -42,6 +42,8 @@ namespace lazyslash {
 			InitializeComponent();
 
 			this->open_new();
+
+			//(gcnew VoteParseSelection)->ShowDialog();
 		}
 
 
@@ -1019,13 +1021,13 @@ namespace lazyslash {
 
 				for each (String^ plugin_path in plugins)
 				{
+					VotePlugin::IVotePlugin^ ivp;
 					try
 					{
 						// call each plugin
 
 						String^ plugin_name = System::IO::Path::GetFileNameWithoutExtension(plugin_path);
 
-						VotePlugin::IVotePlugin^ ivp;
 
 
 						System::Reflection::Assembly^ assem = System::Reflection::Assembly::Load(plugin_name);
@@ -1037,13 +1039,15 @@ namespace lazyslash {
 
 						ArrayList^ vote_output = ivp->parse_votes(vp_pastedata);
 
+						//throw gcnew VotePlugin::VoteParseException("Fake error!");
+
 						// post-plugin processing
 
 						vote_outputs->Add(gcnew array<Object^> { ivp, vote_output } );
 					}
 					catch(VotePlugin::VoteParseException^ vpe)
 					{
-						vote_outputs->Add(gcnew array<Object^> { nullptr, vpe->Message } );
+						vote_outputs->Add(gcnew array<Object^> { nullptr, ivp->vp_name + L" " + ivp->vp_version + ": " + vpe->Message } );
 					}
 					catch(System::Exception^ exc)
 					{
@@ -1059,10 +1063,24 @@ namespace lazyslash {
 
 				}
 
-				// TODO: Ask user which parser results to use
-				(gcnew VoteParseSelection)->ShowDialog();
+				// ask user to select a parse result (if necessary)
 
-				int voteparse_idx = 0;
+				int voteparse_idx;
+
+				if (false && (vote_outputs->Count == 1) && (((array<Object^>^)(vote_outputs[0]))[0] != nullptr))
+				{
+					voteparse_idx = 0;
+				}
+				else
+				{
+					VoteParseSelection^ vps = gcnew VoteParseSelection(vote_outputs);
+					System::Windows::Forms::DialogResult dr = vps->ShowDialog();
+					if (dr != System::Windows::Forms::DialogResult::OK)
+					{
+						return;
+					}
+					voteparse_idx = vps->chosen_idx;
+				}
 
 				VotePlugin::IVotePlugin^ ivp = (VotePlugin::IVotePlugin^)( ((array<Object^>^)(vote_outputs[voteparse_idx]))[0] );
 
