@@ -1039,8 +1039,6 @@ namespace lazyslash {
 
 						ArrayList^ vote_output = ivp->parse_votes(vp_pastedata);
 
-						//throw gcnew VotePlugin::VoteParseException("Fake error!");
-
 						// post-plugin processing
 
 						vote_outputs->Add(gcnew array<Object^> { ivp, vote_output } );
@@ -1106,7 +1104,6 @@ namespace lazyslash {
 
 
 				// get author_entry using plugin->voter
-				//vd->votingby, vd->votingfor
 				if (ivp->voter != nullptr)
 				{
 					vd->votingby = ivp->voter;
