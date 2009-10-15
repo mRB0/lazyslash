@@ -1068,21 +1068,82 @@ namespace lazyslash {
 
 				int voteparse_idx;
 
-				if (false && (vote_outputs->Count == 1) && (((array<Object^>^)(vote_outputs[0]))[0] != nullptr))
+				if ((vote_outputs->Count == 1) && (((array<Object^>^)(vote_outputs[0]))[0] != nullptr))
 				{
 					voteparse_idx = 0;
 				}
 				else
 				{
-					VoteParseSelection^ vps = gcnew VoteParseSelection(vote_outputs);
-					vps->StartPosition = System::Windows::Forms::FormStartPosition::CenterParent;
+					bool allthesame = true;
 
-					System::Windows::Forms::DialogResult dr = vps->ShowDialog();
-					if (dr != System::Windows::Forms::DialogResult::OK)
+					array<Object^>^ lhs_parse = nullptr;
+
+					// check if all vote parser outputs match each other
+					for each (array<Object^>^ rhs_parse in vote_outputs)
 					{
-						return;
+						// parse failure
+						if (rhs_parse[0] == nullptr)
+						{
+							allthesame = false;
+							break;
+						}
+						if (lhs_parse == nullptr)
+						{
+							lhs_parse = rhs_parse;
+							continue;
+						}
+
+						VotePlugin::IVotePlugin^ lhs_ivp = (VotePlugin::IVotePlugin^)( lhs_parse[0] );
+						VotePlugin::IVotePlugin^ rhs_ivp = (VotePlugin::IVotePlugin^)( rhs_parse[0] );
+
+						if (lhs_ivp->voter != rhs_ivp->voter)
+						{
+							allthesame = false;
+							break;
+						}
+
+						ArrayList^ lhs_output = (ArrayList^)( lhs_parse[1] );
+						ArrayList^ rhs_output = (ArrayList^)( rhs_parse[1] );
+						
+						if (lhs_output->Count != rhs_output->Count)
+						{
+							allthesame = false;
+							break;
+						}
+						int i;
+						for(i=0; i < lhs_output->Count; i++)
+						{
+							VotePlugin::Entry^ lhs_e = (VotePlugin::Entry^)(lhs_output[i]);
+							VotePlugin::Entry^ rhs_e = (VotePlugin::Entry^)(rhs_output[i]);
+							if (lhs_e->filename != rhs_e->filename)
+							{
+								allthesame = false;
+								break;
+							}
+						}
+						if (!allthesame)
+						{
+							break;
+						}
 					}
-					voteparse_idx = vps->chosen_idx;
+
+					
+					if (allthesame)
+					{
+						voteparse_idx = 0;
+					}
+					else
+					{
+						VoteParseSelection^ vps = gcnew VoteParseSelection(vote_outputs);
+						vps->StartPosition = System::Windows::Forms::FormStartPosition::CenterParent;
+	
+						System::Windows::Forms::DialogResult dr = vps->ShowDialog();
+						if (dr != System::Windows::Forms::DialogResult::OK)
+						{
+							return;
+						}
+						voteparse_idx = vps->chosen_idx;
+					}
 				}
 
 				VotePlugin::IVotePlugin^ ivp = (VotePlugin::IVotePlugin^)( ((array<Object^>^)(vote_outputs[voteparse_idx]))[0] );
