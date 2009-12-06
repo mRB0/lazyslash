@@ -875,6 +875,7 @@ namespace lazyslash {
 						L"Sorry :(",
 						System::Windows::Forms::MessageBoxButtons::OK);
 				}
+#ifndef _M_CEE_SAFE
 				catch(...)
 				{
 					System::Windows::Forms::MessageBox::Show(
@@ -883,7 +884,7 @@ namespace lazyslash {
 						L"Sorry :(",
 						System::Windows::Forms::MessageBoxButtons::OK);
 				}
-
+#endif
 
 			}
 
@@ -1057,11 +1058,12 @@ namespace lazyslash {
 							L"Slightly less lame error handler",
 							System::Windows::Forms::MessageBoxButtons::OK);
 					}
+#ifndef _M_CEE_SAFE
 					catch(...)
 					{
 
 					}
-
+#endif
 				}
 
 				// ask user to select a parse result (if necessary)
@@ -1456,11 +1458,17 @@ namespace lazyslash {
 
 					plugin_info += ivp->vp_name + L" " + ivp->vp_version + L" by " + ivp->vp_author;
 				}
+				catch(System::Exception^ e)
+				{
+					plugin_info += L"error loading info";
+				}
+#ifndef _M_CEE_SAFE
 				catch(...)
 				{
 					plugin_info += L"error loading info";
 				}
-				
+#endif
+
 				plugin_info += L" (" + System::IO::Path::GetFileName(plugin_path) + L")";
 			}
 
@@ -1633,14 +1641,24 @@ namespace lazyslash {
 					
 					return true;
 				}
-				catch(...)
+				catch(System::Exception^ e)
 				{
 					System::Windows::Forms::MessageBox::Show(
-						L"Some error occurred while saving.\nYour data probably wasn't saved.",
+						L"Some (CLI/.NET) error occurred while saving.\nYour data probably wasn't saved.",
 						L"Bzzt",
 						System::Windows::Forms::MessageBoxButtons::OK);
 					return false;
 				}
+#ifndef _M_CEE_SAFE
+				catch(...)
+				{
+					System::Windows::Forms::MessageBox::Show(
+						L"Some (CRT) error occurred while saving.\nYour data probably wasn't saved.",
+						L"Bzzt",
+						System::Windows::Forms::MessageBoxButtons::OK);
+					return false;
+				}
+#endif
 			}
 			else
 			{
@@ -1763,14 +1781,24 @@ namespace lazyslash {
 
 					return true;
 				}
-				catch(...)
+				catch(System::Exception^ e)
 				{
 					System::Windows::Forms::MessageBox::Show(
-						L"Some error occurred while loading.\nYou should probably exit the program to\nreturn to a consistent state.",
+						L"Some (CLI/.NET) error occurred while loading.\nYou should probably exit the program to\nreturn to a consistent state.",
 						L"Bzzt",
 						System::Windows::Forms::MessageBoxButtons::OK);
 					return false;
 				}
+#ifndef _M_CEE_SAFE
+				catch(...)
+				{
+					System::Windows::Forms::MessageBox::Show(
+						L"Some (CRT) error occurred while loading.\nYou should probably exit the program to\nreturn to a consistent state.",
+						L"Bzzt",
+						System::Windows::Forms::MessageBoxButtons::OK);
+					return false;
+				}
+#endif
 			}
 			else
 			{
