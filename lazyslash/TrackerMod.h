@@ -279,6 +279,52 @@ namespace lazyslash {
 			return songtitle;
 		}
 
+		static String^ TrackerMod::GetNSFTitle(String^ filespec)
+		{
+			String ^songtitle = gcnew String(L"");
+			
+			System::IO::FileStream^ inf;
+			
+			inf = System::IO::File::Open(filespec, System::IO::FileMode::Open, System::IO::FileAccess::Read);
+			
+			System::IO::BinaryReader^ breader = gcnew System::IO::BinaryReader(inf);
+			
+			// nsf header "NESM" and 0x1a
+			bool is_nsf = true;
+			for each (unsigned char cmp in "NESM\x1a")
+			{
+				if (breader->ReadByte() != cmp)
+				{
+					is_nsf = false;
+				}
+			}
+			if (is_nsf)
+			{
+				// swallow 9 bytes to reach offset 0xe
+				breader->ReadBytes(9);
+				array<unsigned char>^ namedata = breader->ReadBytes(32);
+
+				int titlelen = System::Array::IndexOf((array<unsigned char>^)namedata, (unsigned char)0);
+				
+				Console::WriteLine("titlelen is " + titlelen.ToString());
+
+				if (titlelen == -1)
+				{
+					titlelen = 32;
+				}
+				
+				System::Text::ASCIIEncoding^ ae = gcnew System::Text::ASCIIEncoding();
+
+				songtitle = ae->GetString(namedata, 0, titlelen);
+				
+				
+			}
+			
+			inf->Close();
+
+			return songtitle;
+		}
+
 		static String^ TrackerMod::GetSongTitle(String ^filespec)
 		{
 			if (System::IO::Path::GetExtension(filespec)->ToLowerInvariant() == ".it")
@@ -304,6 +350,10 @@ namespace lazyslash {
 			if (System::IO::Path::GetExtension(filespec)->ToLowerInvariant() == ".669")
 			{
 				return TrackerMod::Get669Title(filespec);
+			}
+			if (System::IO::Path::GetExtension(filespec)->ToLowerInvariant() == ".nsf")
+			{
+				return TrackerMod::GetNSFTitle(filespec);
 			}
 
 			return L"";
