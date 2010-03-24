@@ -23,6 +23,8 @@ namespace lazyslash {
 	using namespace System::Windows::Forms;
 	using namespace System::Data;
 	using namespace System::Drawing;
+	using namespace System::Security;
+	using namespace System::IO;
 	
 
 	/// <summary>
@@ -648,23 +650,18 @@ namespace lazyslash {
 			{
 				e->Effect = DragDropEffects::Copy;
 			}
+			else if (e->Data->GetDataPresent(DataFormats::Text))
+			{
+				e->Effect = DragDropEffects::Copy;
+			}
 			else
 			{
 				e->Effect = DragDropEffects::None;
 			}			
 		}
 
-		private: System::Void entriesList_Drop(System::Object^ sender, System::Windows::Forms::DragEventArgs^ e)
+		private: System::Void add_entry_from_dragged_file(array<String^>^ files)
 		{
-			array<String^>^ files;
-
-			if (!e->Data->GetDataPresent(System::Windows::Forms::DataFormats::FileDrop))
-			{
-				return;
-			}
-
-			files = (array<String^>^)(e->Data->GetData(System::Windows::Forms::DataFormats::FileDrop));
-			
 			this->entriesList->Items->Remove(this->_empty_item);
 
 			ListViewItem^ new_item;
@@ -706,6 +703,102 @@ namespace lazyslash {
 			this->entriesList->Sort();
 			this->check_zip_button();
 
+		}
+
+		private: System::Void add_entry_from_dragged_text(String^ text)
+		{
+
+			String^ filename = System::IO::Path::GetFileName(text);
+
+			String^ temp_folder;
+			String^ new_path;
+			bool succeeded = false;
+			String^ songtitle;
+
+			try 
+			{
+				temp_folder = Path::GetTempPath();
+				//temp_folder = "";
+				new_path = String::Concat(temp_folder, filename);
+				System::Net::WebClient^ Client = gcnew System::Net::WebClient;
+				Client->DownloadFile(text, String::Concat(temp_folder, filename));
+				songtitle = TrackerMod::GetSongTitle(new_path)->TrimEnd(nullptr);
+				succeeded = true;
+			}
+			catch(SecurityException^ ex)
+			{
+			  // probably means that you don't have the required permissions
+			}
+			catch(System::Net::WebException^ ex)
+			{
+				MessageBox::Show(text + " doesn't exist or isn't a file!", L"Hurf durf what is internet");
+			}
+			catch(Exception^ ex)
+			{
+			  // handle all other exceptions
+				MessageBox::Show("Something bad happened. :(\n\n" + ex->ToString(), L"Seriously, learn to use computers");
+			}
+						  
+			if (succeeded)
+			{
+
+				this->entriesList->Items->Remove(this->_empty_item);
+				ListViewItem^ new_item;
+					//int songlen = songtitle->Length;
+					
+				new_item = gcnew ListViewItem(gcnew array<String^>{"", "", filename, songtitle});
+				new_item->Tag = gcnew CompoEntry(text, songtitle);
+				
+				this->entriesList->Items->Add(new_item);
+				this->match_entrylist_to_entry(new_item);
+
+				// go directly to edit item
+
+				ArrayList^ songs = gcnew ArrayList;
+				ArrayList^ entrants = gcnew ArrayList;
+				get_current_songs_entrants(songs, entrants);
+
+				EntryEditor ee((CompoEntry^)(new_item->Tag), songs);
+				ee.StartPosition = System::Windows::Forms::FormStartPosition::CenterParent;
+				ee.ShowDialog();
+
+				// make list entry match CompoEntry tag
+				this->match_entrylist_to_entry(new_item);
+				this->entriesList->Sort();
+
+				this->entriesList->Items->Add(_empty_item);
+				this->entriesList->Sort();
+				this->check_zip_button();
+			}
+		}
+
+		delegate System::Void drop_delegate(System::Windows::Forms::DragEventArgs^ e);
+
+		private: System::Void entriesList_Drop(System::Object^ sender, System::Windows::Forms::DragEventArgs^ e)
+		{
+
+			array<System::Object^>^ a = {e};
+			Control::BeginInvoke(gcnew drop_delegate(this, &CompoWindow::do_drop), a);
+			
+
+
+		}
+
+		private: System::Void do_drop(System::Windows::Forms::DragEventArgs^ e)
+		{
+			if (e->Data->GetDataPresent(System::Windows::Forms::DataFormats::FileDrop))
+			{
+				array<String^>^ files;
+				files = (array<String^>^)(e->Data->GetData(System::Windows::Forms::DataFormats::FileDrop));
+				this->add_entry_from_dragged_file(files);
+			}
+			else if (e->Data->GetDataPresent(System::Windows::Forms::DataFormats::Text))
+			{
+				String^ text;
+				text = (String^)(e->Data->GetData(System::Windows::Forms::DataFormats::Text));
+				if (Uri::IsWellFormedUriString(text, UriKind::Absolute))
+					this->add_entry_from_dragged_text(text);
+			}
 		}
 
 		private: System::Void txtCompoName2_TextChanged(System::Object^  sender, System::EventArgs^  e)
@@ -820,9 +913,12 @@ namespace lazyslash {
 				{
 					if (additem != this->_empty_item)
 					{
-						filespecs += L"\"" +
-							((CompoEntry^)additem->Tag)->filespec->Replace('\\', '/') +
-							L"\" ";
+						String^ filename = ((CompoEntry^)additem->Tag)->filespec;
+						if (filename->StartsWith("http://"))
+							filename = Path::GetTempPath() + ((CompoEntry^)additem->Tag)->filename;
+						//else
+						//	filename = ((CompoEntry^)additem->Tag)->filespec;
+						filespecs += L"\"" + filename->Replace('\\', '/') + L"\" ";
 						
 					}
 				}
@@ -848,14 +944,14 @@ namespace lazyslash {
 
 					String^ stdout = zipproc->StandardOutput->ReadToEnd();
 					zipproc->WaitForExit();
-
+					
 					if (zipproc->ExitCode != 0)
 					{
 						ResultsDisplay rd(stdout, L"7zip output");
 						rd.ShowDialog();
 					}
-					
-					this->zipfilePath = sfd->FileName;
+					else
+						this->zipfilePath = sfd->FileName;
 				}
 				catch(System::ComponentModel::Win32Exception^ w32e)
 				{
