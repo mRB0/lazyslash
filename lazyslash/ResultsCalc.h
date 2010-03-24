@@ -245,9 +245,6 @@ private:
 			results += "-----<O>-----\n";
 			results += "These results were generated using lazyslash compomagoo " + 
 				compoversion::version + 
-				" svn rev " +
-				compoversion::svnrevision +
-				" (" + compoversion::svnrevdate + ")" +
 				" (c) 2009 Mike Burke (mrb) - mrburke@gmail.com\n";
 
 			// oops windows
