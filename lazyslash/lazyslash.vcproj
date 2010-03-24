@@ -26,8 +26,9 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
-				Description="Updating SVN revision data"
-				CommandLine="C:\code\svnrev.exe *"
+				Description=""
+				CommandLine=""
+				ExcludedFromBuild="true"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -338,10 +339,6 @@
 			</File>
 			<File
 				RelativePath=".\stdafx.h"
-				>
-			</File>
-			<File
-				RelativePath=".\svnrev.h"
 				>
 			</File>
 			<File

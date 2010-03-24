@@ -4,8 +4,6 @@
  * $Id$
  */
 
-#include "svnrev.h"
-
 using namespace System;
 using namespace System::ComponentModel;
 using namespace System::Collections;
@@ -21,8 +19,6 @@ namespace lazyslash {
 	{
 	public:
 		static String^ version = L"1.0.0";
-		static String^ svnrevision = SVN_REVSTR;
-		static String^ svnrevdate = SVN_REVDATE;
 
 		compoversion(void)
 		{
